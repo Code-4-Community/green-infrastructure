@@ -29,7 +29,7 @@ export default function VolunteerPage() {
       >
         <img src={MapPreview} />
         <a
-          href=""
+          href="/"
           style={{
             top: '50%',
             left: '50%',
