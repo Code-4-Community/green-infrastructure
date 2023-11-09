@@ -59,7 +59,7 @@ export default function Resources() {
         {VOLUNTEER_RESOURCES.map((resource: VolunteerResource) => {
           return (
             <Grid xs={4} item>
-              <BoxPanel textContent={resource.resourceName} />
+              <FlippableTile textContent={resource.resourceName} />
             </Grid>
           );
         })}
@@ -71,7 +71,7 @@ export default function Resources() {
 interface PanelProps {
   textContent: string;
 }
-function BoxPanel(props: PanelProps) {
+function FlippableTile(props: PanelProps) {
   return (
     <ThemeProvider
       theme={{
