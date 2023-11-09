@@ -6,6 +6,7 @@ import Header from './Header';
 import MapLegend from '../../components/map/MapLegend';
 import Navbar from '../Navbar';
 import { SITE_STATUS_ROADMAP } from '../../constants';
+import Tiles from './Tiles';
 
 const icons: string[] = SITE_STATUS_ROADMAP.map((option) => option.image);
 
@@ -25,7 +26,7 @@ export default function MapPage() {
         <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 100 }}>
           <MapLegend selectedFeatures={selectedFeatures} setSelectedFeatures={setSelectedFeatures} selectedStatuses={selectedStatuses} setSelectedStatuses={setSelectedStatuses} icons={icons} />
         </div>
-        <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 100 }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 100 }}>
           <input 
             id="pac-input"
             type="text"
@@ -33,7 +34,6 @@ export default function MapPage() {
             style={{
               width: '200px', 
               height: '40px',
-              borderRadius: '10px',
               fontFamily: "Open Sans",
               paddingLeft: '15px'
             }}
@@ -44,6 +44,9 @@ export default function MapPage() {
       <About />
       <Divider />
       <div style={{ paddingTop: '15px'}} />
+      <div style={{ alignContent: 'center' }}>
+        <Tiles />
+      </div>
     </div>
   );
 }

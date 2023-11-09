@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora&display=swap');
+
+.container {
+  font-family: "Lora", sans-serif;
+  font-size: 20px;
+}
+
+.icon-placeholder {
+  width: 60px;
+  height: 100px;
+  background: #fff; /* White background for the icon placeholder */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #555; /* Icon color (gray) */
+}
+
+.flip-card-outer {
+  width: 330px;
+  height: 253px;
+  margin: 25px 0;
+
+  &.focus-trigger:focus {
+    outline: 5px solid greenyellow;
+    outline-offset: 5px;
+  }
+
+  .flip-card-inner {
+    transform-style: preserve-3d;
+    transition: .5s linear .1s;
+    position: relative;
+    width: inherit;
+    height: inherit;
+
+    &.hover-trigger:hover {
+      transform: rotateY(180deg);
+    }
+
+    &.showBack {
+      transform: rotateY(180deg);
+    }
+  
+    .card {
+      backface-visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+  
+      &.front {
+        transform: rotateY(0);
+        background-color: #f2f2f2;
+        color: #288BE4;
+      }
+  
+      &.back {
+        transform: rotateY(180deg);
+        background-color: #f2f2f2;
+        color: #288BE4;
+      }
+    }
+  }
+}

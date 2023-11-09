@@ -1,4 +1,19 @@
+import { useRef } from "react";
+
+const SCROLL_OFFSET = 20
+const NAVBAR_HEIGHT = 109
+
 export default function About() {
+
+  const aboutSection = useRef(null)
+
+  /* Scrolls to the element that executed this function */
+  function executeScrollTo(e: any) {
+      e.preventDefault();
+      const aboutTitle: HTMLElement = e.target as HTMLElement
+      const yPos = aboutTitle.getBoundingClientRect().top + window.scrollY - (NAVBAR_HEIGHT + SCROLL_OFFSET)
+      window.scrollTo({top: yPos, behavior: 'smooth'} )
+  }
 
   const title = {
     color: 'var(--Text-Primary, #091F2F)',
@@ -42,7 +57,7 @@ export default function About() {
         background: 'white'
       }}
     >
-      <p style={title}><u>ABOUT: ADOPT-A-GREEN INFRASTRUCTURE AND FEATURE VIEWER</u></p>
+      <p ref={aboutSection} onClick={executeScrollTo} style={title}><u>ABOUT: ADOPT-A-GREEN INFRASTRUCTURE AND FEATURE VIEWER</u></p>
       <p style={headings}>Setting the Scene and Brief History: <br />
         <div style={content}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
