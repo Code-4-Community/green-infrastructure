@@ -13,6 +13,33 @@
     padding: 0;
   }
   
+  .featureType {
+    font-family: 'Arimo';
+    line-height: '17.66px';
+    font-size: 15px;
+    margin-bottom: 0px;
+  }
+
+  .featureLabel {
+    font: bold;
+    padding-top: 0px;
+    font-weight: 700;
+    font-family: 'Arimo';
+    font-size: 17px;
+  }
+
+  .adoptLink {
+    font-family: 'Arimo';
+    text-decoration: underline;
+    color: #000000;
+  }
+
+  .statusText {
+    font-family: 'Arimo';
+    margin-top: 25px;
+    margin-bottom: 41px;
+  }
+
   .popup {
     font-family: 'Lora';
     width: 411px;
