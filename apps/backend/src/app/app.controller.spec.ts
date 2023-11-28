@@ -19,4 +19,18 @@ describe('AppController', () => {
       expect(appController.getData()).toEqual({ message: 'Hello API' });
     });
   });
+
+  describe('getAllApplications', () => {
+    it('should return ...', () => {
+      const appController = app.get<AppController>(AppController);
+      expect(appController.getAllApplications()).toEqual({});
+    });
+  });
+
+  describe('getApplicationDetails', () => {
+    it('should return ...', () => {
+      const appController = app.get<AppController>(AppController);
+      expect(appController.getApplicationDetails({ id: 1 })).toEqual({});
+    });
+  });
 });

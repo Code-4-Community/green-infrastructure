@@ -18,4 +18,18 @@ describe('AppService', () => {
       expect(service.getData()).toEqual({ message: 'Hello API' });
     });
   });
+
+  describe('getAllApplications', () => {
+    it('should return ...', () => {
+      expect(service.getAllApplications()).toEqual({});
+    });
+  });
+
+  describe('getApplicationDetails', () => {
+    it('should return ...', () => {
+      expect(
+        service.getApplicationDetails('GIApplications', { key: 1 }),
+      ).toEqual({});
+    });
+  });
 });
