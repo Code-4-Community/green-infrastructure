@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Request } from '@nestjs/common';
 
 import { AppService } from './app.service';
 
@@ -9,5 +9,10 @@ export class AppController {
   @Get('/sites')
   async getData() {
     return this.appService.getData();
+  }
+
+  @Post('/application')
+  async postApplication(@Request() data: any) {
+    return this.appService.postApplication(data);
   }
 }

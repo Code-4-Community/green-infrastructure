@@ -1,4 +1,4 @@
-import { DynamoDBClient, ScanCommand, PutItemCommand, GetItemCommand, DeleteItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, ScanCommand, PutItemCommand, GetItemCommand, DeleteItemCommand, ServiceOutputTypes } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { Site as siteSchema } from 'apps/common/src/lib/dto/Site';
 import type { Site } from 'apps/common/src/lib/dto/Site';
@@ -28,6 +28,25 @@ export async function scanAllSites(): Promise<unknown[]> {
   //   siteSchema.parse(i)
   // );
   return unmarshalledItems;
+}
+
+export async function postApplicationToDB(req: Request) {
+  const parameters = {
+    TableName: 'GIApplications',
+    Item: marshall({
+      // Should appID be populated automatically?
+      appID: req.body.appId,
+      address: req.body.address, 
+      content: req.body.content,
+      email: req.body.email,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName, 
+      phone: req.body.phone,
+    }),
+  }
+  const command = new PutItemCommand(parameters);
+  const dynamoRawResult = await client.send(command);
+  return dynamoRawResult;
 }
 
 // export async function postPractitioner(req: Request): Promise<Practitioner> {
