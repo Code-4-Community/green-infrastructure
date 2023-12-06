@@ -6,28 +6,36 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  // Example Route
   @Get()
-  getData() {
+  async getData() {
     return this.appService.getData();
   }
 
+  // Grab all GIApplications in the db
   @Get('/applications')
-  getAllApplications() {
-    return this.appService.getAllApplications();
+  async getAllApplications() {
+    return this.appService.getAllGIApplications();
   }
 
+// Grab the application that matches the id provided
   @Get('/applications/:id')
-  async getApplicationDetails(@Param('id') id: number) {
+  async getGIApplicationDetails(@Param('id') id: number) {
     const tableName = 'GIApplications';
+    /* Key carrying: {
+        - ID of application
+    }
+    */
     const key = { appID: id };
     try {
-      const document = await this.appService.getApplicationDetails(
+      const document = await this.appService.getGIApplicationDetails(
         tableName,
         key,
       );
-      return { success: true, data: document };
+      return document.message; // { success: true, data: document };
     } catch (error) {
       return { success: false, error: 'Failed to get document from DynamoDB' };
     }
   }
+  
 }

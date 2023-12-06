@@ -1,31 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
+import { scanAllGIApplications, scanAllSites, scanGIApplicationDetails } from '../dynamodb';
+import getAllSites from '../workflows/sites/getAllSites';
+import getAllGIApplications from '../workflows/applications/getAllGIApplications';
+import getGIApplicationDetails from '../workflows/applications/getGIApplicationDetails';
+import { ApplicationFilters } from '../workflows/applications/requestTypes/types';
 
+
+const getAllSitesHandler = async () =>
+  getAllSites(scanAllSites);
+
+  const getAllGIApplicationsHandler = async () =>
+  getAllGIApplications(scanAllGIApplications);
+
+  const getGIApplicationDetailsHandler = async (tableName: string, key: any) => {
+    // Search filter that uses the table name and unique identifier for that table
+    const filter: ApplicationFilters = { tableName, uniqueIdentifier: key };
+    return getGIApplicationDetails(scanGIApplicationDetails, filter);
+  }
+  
 @Injectable()
 export class AppService {
   private readonly dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-  getData(): { message: string } {
-    return { message: 'Hello API' };
+  async getData(): Promise<{ message: unknown[]; }> {
+    return { message: await getAllSitesHandler() };
   }
 
-  getAllApplications(): { id: number } {
-    return;
+  // Grab all GIApplications in the database
+  // Implicit use of the GIApplications table
+  async getAllGIApplications(): Promise<{ message: unknown[]; }> {
+    return { message: await getAllGIApplicationsHandler() };
   }
 
-  async getApplicationDetails(tableName: string, key: any): Promise<any> {
-    const params = {
-      TableName: tableName,
-      Key: key,
-    };
-
-    try {
-      const result = await this.dynamoDB.get(params).promise();
-      console.log('Result from DynamoDB:', result.Item);
-      return result.Item;
-    } catch (error) {
-      console.error('Error getting document from DynamoDB:', error);
-      throw error;
-    }
+  // Grab application details based on an application id
+  // Tablename = GIApplications
+  // key = { id: number }
+  async getGIApplicationDetails(tableName: string, key: any): Promise<any> {
+    const appID = key.appID;
+    return { message: await getGIApplicationDetailsHandler(tableName, appID) };
   }
 }
