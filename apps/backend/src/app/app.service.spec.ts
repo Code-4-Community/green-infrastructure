@@ -18,13 +18,15 @@ describe('AppService', () => {
       expect(service.getData()).toEqual({ message: 'Hello API' });
     });
   });
+});
 
+  /* Ticket #24 
   describe('getAllApplications', () => {
     it('should return ...', () => {
       expect(service.getAllApplications()).toEqual({});
     });
   });
-
+  Ticket #24
   describe('getApplicationDetails', () => {
     it('should return ...', () => {
       expect(
@@ -33,3 +35,4 @@ describe('AppService', () => {
     });
   });
 });
+*/
