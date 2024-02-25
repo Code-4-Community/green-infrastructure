@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post, Request } from '@nestjs/common';
 
 import { AppService } from './app.service';
 
@@ -6,8 +6,13 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getData() {
+  @Get('/sites')
+  async getData() {
     return this.appService.getData();
+  }
+
+  @Post('/application')
+  async postApplication(@Request() data: any) {
+    return this.appService.postApplication(data);
   }
 }
