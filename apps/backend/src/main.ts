@@ -6,6 +6,7 @@
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
+import * as AWS from 'aws-sdk';
 
 import { AppModule } from './app/app.module';
 
@@ -23,6 +24,13 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  // Configure AWS SDK
+  AWS.config.update({
+    accessKeyId: 'X',
+    secretAccessKey: 'X',
+    region: 'us-east-2',
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
