@@ -1,0 +1,13 @@
+export default function generateRedline() {
+  return (
+    <svg
+      width="139"
+      height="4"
+      viewBox="0 0 139 4"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <line y1="2" x2="139.004" y2="2" stroke="#FB4D42" stroke-width="4" />
+    </svg>
+  );
+}

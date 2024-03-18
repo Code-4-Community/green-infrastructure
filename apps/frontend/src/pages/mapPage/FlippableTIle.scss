@@ -1,24 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Lora&display=swap');
 
 .container {
-  font-family: "Lora", sans-serif;
-  font-size: 20px;
+  font-family: Lora;
+  font-size: 40px;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 51px;
+  letter-spacing: 0em;
 }
 
 .icon-placeholder {
-  width: 60px;
-  height: 100px;
-  background: #fff; /* White background for the icon placeholder */
+  width: 300px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #555; /* Icon color (gray) */
+  padding-left: 30px;
+  padding-top: 40px;
+
 }
 
+.card-text {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start; 
+  padding-left: 30px;
+  text-align: left;
+}
+
+
 .flip-card-outer {
-  width: 330px;
-  height: 253px;
+  width: 320px;
+  height: 320px;
   margin: 25px 0;
 
   &.focus-trigger:focus {
@@ -51,15 +63,17 @@
   
       &.front {
         transform: rotateY(0);
-        background-color: #f2f2f2;
-        color: #288BE4;
+        background-color: #288BE4;
+        color: #FFFDFD;
       }
-  
+
       &.back {
         transform: rotateY(180deg);
         background-color: #f2f2f2;
         color: #288BE4;
       }
+
+      border-radius: 0;
     }
   }
 }
