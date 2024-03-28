@@ -35,13 +35,13 @@ import {
     async findAll(currentUser: User, getAllMembers: boolean): Promise<User[]> {
       if (!getAllMembers) return [];
   
-      if (currentUser.status === UserStatus.APPLICANT) {
-        throw new UnauthorizedException();
-      }
+      // if (currentUser.status === UserStatus.APPLICANT) {
+      //   throw new UnauthorizedException();
+      // }
   
       const users: User[] = await this.usersRepository.find({
         where: {
-          status: { $not: { $eq: UserStatus.APPLICANT } },
+          status: { $not: { $eq: UserStatus.ADMIN } },
         },
       });
   
@@ -65,19 +65,18 @@ import {
       switch (currentStatus) {
         // Admins and recruiters can access all users
         case UserStatus.ADMIN:
-        case UserStatus.RECRUITER:
           break;
         // Alumni and members can access all users except for applicants
-        case UserStatus.ALUMNI:
-        case UserStatus.MEMBER:
-          if (targetStatus === UserStatus.APPLICANT) {
-            throw new NotFoundException(`User with ID ${userId} not found`);
-          }
-          break;
+        // case UserStatus.ALUMNI:
+        // case UserStatus.MEMBER:
+        //   if (targetStatus === UserStatus.APPLICANT) {
+        //     throw new NotFoundException(`User with ID ${userId} not found`);
+        //   }
+        //   break;
         // Applicants can access all users except for applications that are not their own
-        case UserStatus.APPLICANT:
+        case UserStatus.VOLUNTEER:
           if (
-            targetStatus === UserStatus.APPLICANT &&
+            targetStatus === UserStatus.VOLUNTEER &&
             currentUser.id !== user.id
           ) {
             throw new NotFoundException(`User with ID ${userId} not found`);
@@ -98,7 +97,7 @@ import {
     async updateUser(
       currentUser: User,
       userId: number,
-      updateUserDTO: UpdateUserRequestDTO,
+      // updateUserDTO: UpdateUserRequestDTO,
     ): Promise<User> {
       const user: User = await this.findOne(currentUser, userId);
   
@@ -107,7 +106,7 @@ import {
       }
   
       try {
-        await this.usersRepository.update({ id: userId }, updateUserDTO);
+        // await this.usersRepository.update({ id: userId }, updateUserDTO);
       } catch (e) {
         throw new BadRequestException('Cannot update user');
       }
