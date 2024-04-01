@@ -38,3 +38,28 @@ export async function scanGISitesById(filter: ApplicationFilters): Promise<unkno
 
   return unmarshalledItem;
 }
+
+/* Applications */
+
+/*-> Scan GI Applications and grab the application that matches the id inside the filter */
+export async function scanGIApplicationForSiteId(filter: ApplicationFilters): Promise<unknown> {
+
+  // Assuming 'appID' is the name of the attribute and it's of type String
+  const appId: number = filter.uniqueIdentifier;
+
+  const command = new GetItemCommand({
+    TableName: filter.tableName,
+    Key: {
+      'appID': {N: appId.toString() }
+    }
+  });
+
+  const dynamoRawResult = await client.send(command);
+  if (!dynamoRawResult || !dynamoRawResult.Item) {
+    throw new Error('No item found with the given siteId');
+  }
+
+  const unmarshalledItem = unmarshall(dynamoRawResult.Item);
+
+  return unmarshalledItem;
+}

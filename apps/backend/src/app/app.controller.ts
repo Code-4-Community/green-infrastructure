@@ -21,4 +21,21 @@ export class AppController {
       return { success: false, error: 'Failed to get site document from DynamoDB' };
     }
   }
+
+  @Get('/applications/:id/site')
+  async getSiteIdAssocWithApp(@Param('id') id: number) {
+    const tableName = 'GIApplications';
+    const key = { appId: id };
+
+    try {
+      const document = await this.appService.getSiteIdAssocWithApp(
+        tableName,
+        key,
+      );
+      return document.message; // success: true
+    } catch (error) {
+      return { success: false, error: 'Failed to get site document from DynamoDB' };
+    }
+  }
 }
+
