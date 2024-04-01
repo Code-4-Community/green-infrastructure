@@ -35,13 +35,13 @@ import {
     async findAll(currentUser: User, getAllMembers: boolean): Promise<User[]> {
       if (!getAllMembers) return [];
   
-      if (currentUser.status === UserStatus.APPLICANT) {
+      if (currentUser.status === UserStatus.VOLUNTEER) {
         throw new UnauthorizedException();
       }
   
       const users: User[] = await this.usersRepository.find({
         where: {
-          status: { $not: { $eq: UserStatus.APPLICANT } },
+          status: { $not: { $eq: UserStatus.ADMIN } },
         },
       });
   
@@ -65,26 +65,12 @@ import {
       switch (currentStatus) {
         // Admins and recruiters can access all users
         case UserStatus.ADMIN:
-        case UserStatus.RECRUITER:
           break;
-        // Alumni and members can access all users except for applicants
-        case UserStatus.ALUMNI:
-        case UserStatus.MEMBER:
-          if (targetStatus === UserStatus.APPLICANT) {
-            throw new NotFoundException(`User with ID ${userId} not found`);
-          }
+        case UserStatus.VOLUNTEER:
           break;
-        // Applicants can access all users except for applications that are not their own
-        case UserStatus.APPLICANT:
-          if (
-            targetStatus === UserStatus.APPLICANT &&
-            currentUser.id !== user.id
-          ) {
-            throw new NotFoundException(`User with ID ${userId} not found`);
-          }
+        default:
           break;
       }
-  
       return user;
     }
   
@@ -95,25 +81,25 @@ import {
       });
     }
   
-    async updateUser(
-      currentUser: User,
-      userId: number,
-      updateUserDTO: UpdateUserRequestDTO,
-    ): Promise<User> {
-      const user: User = await this.findOne(currentUser, userId);
+    // async updateUser(
+    //   currentUser: User,
+    //   userId: number,
+    //   updateUserDTO: '',
+    // ): Promise<User> {
+    //   const user: User = await this.findOne(currentUser, userId);
   
-      if (!user) {
-        throw new NotFoundException(`User with ID ${userId} not found`);
-      }
+    //   if (!user) {
+    //     throw new NotFoundException(`User with ID ${userId} not found`);
+    //   }
   
-      try {
-        await this.usersRepository.update({ id: userId }, updateUserDTO);
-      } catch (e) {
-        throw new BadRequestException('Cannot update user');
-      }
+    //   try {
+    //     await this.usersRepository.update({ id: userId }, updateUserDTO);
+    //   } catch (e) {
+    //     throw new BadRequestException('Cannot update user');
+    //   }
   
-      return await this.findOne(currentUser, userId);
-    }
+    //   return await this.findOne(currentUser, userId);
+    // }
   
     async remove(currentUser: User, userId: number): Promise<User> {
       const user = await this.findOne(currentUser, userId);
