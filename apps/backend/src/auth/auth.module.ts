@@ -15,6 +15,8 @@ import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
+  // controllers: [],
   providers: [AuthService, UsersService, JwtStrategy, CurrentUserInterceptor],
+  // providers: [AuthService]
 })
 export class AuthModule {}

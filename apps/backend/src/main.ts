@@ -8,9 +8,11 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app/app.module';
+import { AuthModule } from './auth/auth.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AuthModule);
+  // const auth = await NestFactory.create(AppModule);
   app.enableCors();
 
   const globalPrefix = 'api';
@@ -22,7 +24,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup(globalPrefix, app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

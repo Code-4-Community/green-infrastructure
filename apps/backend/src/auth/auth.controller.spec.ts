@@ -47,9 +47,9 @@ describe('AuthController', () => {
 
             await expect(
                 controller.createUser({
-                    firstName: 'Ahnaf',
-                    lastName: 'Inkiad',
-                    email: 'inkiad.a@northeastern.edu',
+                    firstName: 'Armaan',
+                    lastName: 'Agrawal',
+                    email: 'agrawal.arm@northeastern.edu',
                     password: 'Password1!',
                 }),
             ).resolves.not.toThrow(
@@ -64,9 +64,9 @@ describe('AuthController', () => {
 
             await expect(
                 controller.createUser({
-                    firstName: 'Ahnaf',
-                    lastName: 'Inkiad',
-                    email: 'inkiad.a@nnnnortheastern.edu',
+                    firstName: 'Armaan',
+                    lastName: 'Agrawal',
+                    email: 'agrawal.arm@nnnnortheastern.edu',
                     password: 'Password1!',
                 }),
             ).rejects.toThrow(

@@ -13,7 +13,7 @@ import {
   export class UsersService {
     constructor(
       @InjectRepository(User)
-      private usersRepository: MongoRepository<User>,
+      private usersRepository: any,
     ) {}
   
     async create(
