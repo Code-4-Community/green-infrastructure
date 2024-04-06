@@ -7,7 +7,6 @@ import {
   ISignUpResult,
 } from 'amazon-cognito-identity-js';
 import {
-  AdminDeleteUserCommand,
   AttributeType,
   CognitoIdentityProviderClient,
   ListUsersCommand,
@@ -57,6 +56,9 @@ export class AuthService {
     lastName,
     email,
     password,
+    phoneNumber,
+    zipCode,
+    birthdate,
   }: SignUpRequestDTO): Promise<ISignUpResult> {
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
@@ -66,6 +68,18 @@ export class AuthService {
           new CognitoUserAttribute({
             Name: 'name',
             Value: `${firstName} ${lastName}`,
+          }),
+          new CognitoUserAttribute({
+            Name: 'phoneNumber',
+            Value: `${phoneNumber}`,
+          }),
+          new CognitoUserAttribute({
+            Name: 'zipCode',
+            Value: `${zipCode}`,
+          }),
+          new CognitoUserAttribute({
+            Name: 'birthdate',
+            Value: `${birthdate}`,
           }),
         ],
         null,
@@ -77,21 +91,6 @@ export class AuthService {
           }
         },
       );
-    });
-  }
-
-  verifyUser(email: string, verificationCode: string): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-      return new CognitoUser({
-        Username: email,
-        Pool: this.userPool,
-      }).confirmRegistration(verificationCode, true, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
     });
   }
 
@@ -123,50 +122,10 @@ export class AuthService {
     });
   }
 
-  // TODO not currently used
-  forgotPassword(email: string): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-      return new CognitoUser({
-        Username: email,
-        Pool: this.userPool,
-      }).forgotPassword({
-        onSuccess: function (result) {
-          resolve(result);
-        },
-        onFailure: function (err) {
-          reject(err);
-        },
-      });
-    });
-  }
-
-  // TODO not currently used
-  confirmPassword(
-    email: string,
-    verificationCode: string,
-    newPassword: string,
-  ): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-      return new CognitoUser({
-        Username: email,
-        Pool: this.userPool,
-      }).confirmPassword(verificationCode, newPassword, {
-        onSuccess: function (result) {
-          resolve(result);
-        },
-        onFailure: function (err) {
-          reject(err);
-        },
-      });
-    });
-  }
-
-  async deleteUser(email: string): Promise<void> {
-    const adminDeleteUserCommand = new AdminDeleteUserCommand({
-      Username: email,
-      UserPoolId: CognitoAuthConfig.userPoolId,
-    });
-
-    await this.providerClient.send(adminDeleteUserCommand);
-  }
+  // findByEmail(email: string): Promise<User[]> {
+  //   return this.userPool.find({
+  //     where: { email },
+  //     relations: ['applications'],
+  //   });
+  // }
 }

@@ -4,17 +4,17 @@ import { PassportModule } from '@nestjs/passport';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { UsersService } from '../users/users.service';
-import { User } from '../users/user.entity';
+import { ApplicationsService } from '../applications/applications.service';
+import { Application } from '../applications/applications.entity';
 import { JwtStrategy } from './jwt.strategy';
 import { CurrentUserInterceptor } from '../interceptors/current-user.interceptor';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Application]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UsersService, JwtStrategy, CurrentUserInterceptor],
+  providers: [AuthService, ApplicationsService, JwtStrategy, CurrentUserInterceptor],
 })
 export class AuthModule {}
