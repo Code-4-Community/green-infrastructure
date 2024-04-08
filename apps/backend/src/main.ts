@@ -24,13 +24,14 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  
-// Configure AWS SDK
-AWS.config.update({
+
+  // Configure AWS SDK
+  AWS.config.update({
   accessKeyId: 'AKIAXEDZZITUZRXNFN74',
   secretAccessKey: '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',
   region: 'us-east-2',
-});
+  });
+  
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
