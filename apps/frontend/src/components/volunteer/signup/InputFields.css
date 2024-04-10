@@ -1,0 +1,19 @@
+.input-fields-container {
+    width: 100%;
+    align-items: flex-start;
+}
+
+.input-group-double {
+    width: 100%;
+    justify-content: space-between;
+}
+
+.label {
+    align-self: flex-start;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.input-field {
+    width: 100%;
+}

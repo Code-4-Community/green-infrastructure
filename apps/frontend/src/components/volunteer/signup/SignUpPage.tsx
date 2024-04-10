@@ -1,6 +1,11 @@
-import { Box, Input, Text, Stack, HStack, VStack } from '@chakra-ui/react';
-import { Checkbox } from '@mui/material';
+import { Box, Input, Text, Stack, HStack, VStack, Button } from '@chakra-ui/react';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import { grey } from '@mui/material/colors';
+import { useState, useEffect } from 'react';
+import './SignUpPage.css';
+import './InputFields.css';
+
 
 interface InputField {
     label: string;
@@ -18,126 +23,126 @@ interface InputFieldGroup {
     width: string,
 }
 
-const checkboxesMap : CheckboxField[] = [
-    {
-        label: 'I have reviewed the General Safety Guidelines'
-    },
-    {
-        label: 'I have read and agree to the Terms of Use and Privacy Policy'
-    },
-    {
-        label: 'I have read and agree to the Release of Liability'
-    }
-]
+const checkboxesMap: CheckboxField[] = [
+    { label: 'I have reviewed the General Safety Guidelines' },
+    { label: 'I have read and agree to the Terms of Use and Privacy Policy' },
+    { label: 'I have read and agree to the Release of Liability' },
+];
 
 const inputFieldsMap: InputFieldGroup[] = [
-    {
-        fields: [
-            { label: 'First Name' },
-            { label: 'Last Name' }
-        ],
-        type: 'double',
-        height: "40px",
-        width: "373px",
-    },
-    {
-        fields: [{ label: 'Email Address' }],
-        type: 'single',
-        height: "40px",
-        width: "810px",
-    },
-    {
-        fields: [{ label: 'Phone Number' }],
-        type: 'single',
-        height: "40px",
-        width: "810px",
-    },
-    {
-        fields: [{ label: 'Zip Code' }],
-        type: 'single',
-        height: "40px",
-        width: "369px",
-    },
-    {
-        fields: [{ label: 'Age' }],
-        type: 'single',
-        height: "40px",
-        width: "107px",
-    },
-    {
-        fields: [{ label: 'Which days are you available to volunteer', placeholder: 'Select days' }],
-        type: 'single',
-        height: "40px",
-        width: "454px",
-    },
-]
+    { fields: [{ label: 'First Name' }, { label: 'Last Name' }], type: 'double', height: "40px", width: "373px" },
+    { fields: [{ label: 'Email Address' }], type: 'single', height: "40px", width: "810px" },
+    { fields: [{ label: 'Phone Number' }], type: 'single', height: "40px", width: "810px" },
+    { fields: [{ label: 'Zip Code' }], type: 'single', height: "40px", width: "369px" },
+    { fields: [{ label: 'Age' }], type: 'single', height: "40px", width: "107px" },
+    { fields: [{ label: 'Which days are you available to volunteer', placeholder: 'Select days' }], type: 'single', height: "40px", width: "454px" },
+];
 
-function InputFields() {
+function InputFields({ onInputChange }) {
     return (
-        <VStack spacing={4}>
+        <VStack className="input-fields-container" spacing={4}>
             {inputFieldsMap.map((group, i) => (
-                <VStack key={i} width="100%" spacing={1} align="flex-start">
+                <VStack key={i} className="input-fields-container" spacing={1}>
                     {group.type === 'double' ? (
-                        <HStack width="100%" justifyContent="space-between">
+                        <HStack className="input-group-double">
                             {group.fields.map((field, j) => (
-                                <VStack key={j} width={group.width}>
-                                    <Text className='label' alignSelf="flex-start" fontSize="18px" fontWeight={600}>{field.label}</Text>
-                                    <Input variant='filled' height={group.height} placeholder={field.placeholder || 'example'} width="100%"/>
+                                <VStack key={j} width={group.width} className="input-field-container">
+                                    <Text className='label'>{field.label}</Text>
+                                    <Input 
+                                        className="input-field" 
+                                        variant='filled' 
+                                        height={group.height} 
+                                        placeholder={field.placeholder || '...'} 
+                                        onChange={(e) => onInputChange(field.label, e.target.value)} 
+                                    />
                                 </VStack>
                             ))}
                         </HStack>
                     ) : (
-                        <VStack width={group.width} align="flex-start">
-                            <Text className='label' fontSize="18px" fontWeight={600} alignSelf="flex-start">{group.fields[0].label}</Text>
-                            <Input variant='filled' height={group.height} placeholder={group.fields[0].placeholder || 'example'} width="100%"/>
+                        <VStack width={group.width} className="input-field-container">
+                            <Text className='label'>{group.fields[0].label}</Text>
+                            <Input 
+                                className="input-field" 
+                                variant='filled' 
+                                height={group.height} 
+                                placeholder={group.fields[0].placeholder || '...'} 
+                                onChange={(e) => onInputChange(group.fields[0].label, e.target.value)} 
+                            />
                         </VStack>
                     )}
                 </VStack>
             ))}
         </VStack>
-    )
+    );
 }
 
-function CheckboxFields() {
+function CheckboxFields({ onCheckboxChange, checkboxes }) {
     return (
         <VStack>
             {checkboxesMap.map((field, i) => (
-                <HStack key={i} width="100%" height="100%">
-                    <Text textDecoration="underline">{field.label}</Text>
-                    <Checkbox 
-                        sx={{
-                            color: '#808080', // Grey color for the checkbox when not checked
-                            '&.Mui-checked': {
-                                color: '#808080', // Grey color for the checkbox when checked
-                            },
-                            '& .MuiSvgIcon-root': { 
-                                fontSize: 30,
-                            },
-                        }}
-                    />
-                </HStack>
+                <FormControlLabel
+                    key={i}
+                    control={
+                        <Checkbox
+                            checked={checkboxes[field.label]}
+                            onChange={(e) => onCheckboxChange(field.label, e.target.checked)}
+                            sx={{
+                                color: grey[500],
+                                '&.Mui-checked': {
+                                    color: grey[600],
+                                },
+                                '& .MuiSvgIcon-root': { 
+                                    fontSize: 30,
+                                },
+                            }}
+                        />
+                    }
+                    label={field.label}
+                />
             ))}
         </VStack>
     );
 }
 
-export default function SignUpPage() {
+function SignUpPage() {
+    const [inputValues, setInputValues] = useState({});
+    const [checkboxStates, setCheckboxStates] = useState({});
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    useEffect(() => {
+        const allInputsFilled = Object.keys(inputValues).length === inputFieldsMap.reduce((acc, curr) => acc + curr.fields.length, 0) && Object.values(inputValues).every(value => value !== '');
+        const allCheckboxesChecked = Object.values(checkboxStates).every(value => value === true);
+        setIsFormValid(allInputsFilled && allCheckboxesChecked);
+    }, [inputValues, checkboxStates]);
+
+    const handleInputChange = (fieldLabel, value) => {
+        setInputValues(prev => ({ ...prev, [fieldLabel]: value }));
+    };
+
+    const handleCheckboxChange = (fieldLabel, checked) => {
+        setCheckboxStates(prev => ({ ...prev, [fieldLabel]: checked }));
+    };
+
+    const handleSubmit = () => {
+        alert('Application sent!');
+    };
+
     return (
-        <Box className='outermost-box' display="flex" alignItems="center" justifyContent="center" bg='#D9D9D9' w='1104px' h='1025px'>
-            <Box className='inner-box' bg="#FFFDFD" height="943.08px" width="971px" top="-455.11px" left="1454px" display='flex' flexDirection='column' alignItems='center' justifyContent='space-evenly'>
-                <Box className='header-box' height="41.94px" width="809.05px" borderBottom="1px solid #000000" display="flex" justifyContent="center" alignItems="center">
+        <Box className='outermost-box'>
+            <Box className='inner-box'>
+                <Box className='header-box'>
                     <Text fontFamily='Montserrat' fontSize='30px'>Welcome, Volunteer!</Text>
                 </Box>
-                <Box className='input-fields-main' width="809.05px" mt="20px">
-                    <InputFields/>
+                <Box className='input-fields-main'>
+                    <InputFields onInputChange={handleInputChange} />
                 </Box>
-                <Box className='check-boxes-main' 
-                width="809.05px" height="265px" top="155px" left="1536px"
-                 borderTop="1px solid #000000" borderBottom="1px solid #000000"
-                 display="flex" alignItems='space-evenly'>
-                    <CheckboxFields/>
+                <Box className='check-boxes-main'>
+                    <CheckboxFields onCheckboxChange={handleCheckboxChange} checkboxes={checkboxStates} />
                 </Box>
+                <Button isDisabled={!isFormValid} onClick={handleSubmit}> Submit </Button>
             </Box>
         </Box>
-    )
+    );
 }
+
+export default SignUpPage;
