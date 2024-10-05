@@ -75,7 +75,7 @@ function Navbar() {
               >
                 SIGN UP
               </button>
-              <Link to="/login" style={{ textDecoration: 'none' }}></Link>
+              <Link to="/login" style={{ textDecoration: 'none' }}>
               <button
                 style={{
                   font: 'Montserrat',
@@ -89,6 +89,7 @@ function Navbar() {
               >
                 LOG IN
               </button>
+              </Link>
               <img src={profileLogo} style={{ cursor: 'pointer' }} onClick={toggleSidePanel} />
             </div>
             </Toolbar>
