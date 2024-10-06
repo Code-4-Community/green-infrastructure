@@ -1,8 +1,3 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { NestFactory } from '@nestjs/core';
@@ -17,8 +12,8 @@ async function bootstrap() {
   app.setGlobalPrefix('');
 
   const config = new DocumentBuilder()
-    .setTitle('Scaffolding API Docs')
-    .setDescription('Documentation for the scaffolding REST API routes')
+    .setTitle('Green Infrastructure API Docs')
+    .setDescription('Documentation for the Green Infrastructure REST API routes')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
