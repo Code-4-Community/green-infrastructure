@@ -78,7 +78,7 @@ function Navbar() {
               >
                 SIGN UP
               </button>
-              <Link to="/login" style={{ textDecoration: 'none' }}></Link>
+              <Link to="/login" style={{ textDecoration: 'none' }}>
               <button
                 onMouseEnter={() => setLogInHovered(true)}
                 onMouseLeave={() => setLogInHovered(false)}
@@ -94,6 +94,7 @@ function Navbar() {
               >
                 LOG IN
               </button>
+              </Link>
               <img src={profileLogo} style={{ cursor: 'pointer' }} onClick={toggleSidePanel} />
             </div>
             </Toolbar>
