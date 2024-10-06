@@ -12,7 +12,8 @@ function Navbar() {
   const [selected, setSelected] = useState(false);
   const [showSignupPopup, setShowSignupPopup] = useState(false);
   const [showSidePanel, setShowSidePanel] = useState(false);
-
+  const [logInHovered, setLogInHovered] = useState(false);
+  const [signUpHovered, setSignUpHovered] = useState(false);
 
   const openSignupPopup = () => {
     setShowSignupPopup(true);
@@ -62,9 +63,11 @@ function Navbar() {
             <img src={c4cLogo} />
             <div style={{ marginRight: 0, marginLeft: 'auto' }}>
               <button
+                onMouseEnter={() => setSignUpHovered(true)}
+                onMouseLeave={() => setSignUpHovered(false)}
                 style={{
                   font: 'Montserrat',
-                  color: selected ? 'red' : 'black',
+                  color: signUpHovered ? 'red' : 'black',
                   background: 'none',
                   border: 'none',
                   padding: 0,
@@ -77,9 +80,11 @@ function Navbar() {
               </button>
               <Link to="/login" style={{ textDecoration: 'none' }}></Link>
               <button
+                onMouseEnter={() => setLogInHovered(true)}
+                onMouseLeave={() => setLogInHovered(false)}
                 style={{
                   font: 'Montserrat',
-                  color: 'black',
+                  color: logInHovered ? 'red' : 'black',
                   background: 'none',
                   border: 'none',
                   padding: 0,
