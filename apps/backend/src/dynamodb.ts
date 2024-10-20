@@ -1,5 +1,9 @@
-import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { Injectable } from "@nestjs/common";
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  ScanCommand,
+} from '@aws-sdk/client-dynamodb';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class DynamoDbService {
@@ -15,7 +19,10 @@ export class DynamoDbService {
     });
   }
 
-  public async getItem(tableName: string, key: { [key: string]: any }): Promise<any> {
+  public async getItem(
+    tableName: string,
+    key: { [key: string]: any },
+  ): Promise<any> {
     const params = {
       TableName: tableName,
       Key: key,
@@ -30,4 +37,12 @@ export class DynamoDbService {
     }
   }
 
+  public async scanTable(tableName: string): Promise<any[]> {
+    const params = {
+      TableName: tableName,
+    };
+    const command = new ScanCommand(params);
+    const result = await this.dynamoDbClient.send(command);
+    return result.Items;
+  }
 }
