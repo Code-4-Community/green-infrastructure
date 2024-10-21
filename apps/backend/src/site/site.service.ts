@@ -5,7 +5,7 @@ import { DynamoDbService } from "../dynamodb";
 @Injectable()
 export class SiteService {
 
-    private readonly tableName = 'GIBostonSites';
+    private readonly tableName = 'greenInfraBostonSites';
 
     constructor(private readonly dynamoDbService: DynamoDbService) {}
 
@@ -16,7 +16,7 @@ export class SiteService {
     */
     public async getSite(siteId: number): Promise<SiteModel> {
         try{
-            const key = { 'Object ID?': { N: siteId } };
+            const key = { 'siteId': { S: siteId.toString() } };
             const data = await this.dynamoDbService.getItem(this.tableName, key);
             return(this.mapDynamoDBItemToSite(siteId, data));
         }  
@@ -28,16 +28,16 @@ export class SiteService {
     private mapDynamoDBItemToSite = (objectId: number, item: { [key: string]: any }): SiteModel => {
         return {
             siteID: objectId,
-            siteName: item["Asset Name"].S,
+            siteName: item["siteName"].S,
             siteStatus: SiteStatus.AVAILABLE, //placeholder until table is updated
-            assetType: item["Asset Type"].S,
-            symbolType: item["Symbol Type"].S,
-            siteLatitude: item["Lat"].S,
-            siteLongitude: item["Long"].S,
+            assetType: item["assetType"].S,
+            symbolType: item["symbolType"].S,
+            siteLatitude: item["siteLatitude"].S,
+            siteLongitude: item["siteLongitude"].S,
             dateAdopted: new Date(), //placeholder until table is updated
             maintenanceReports: [], //placeholder until table is updated
-            neighborhood: item["Neighborhood"].S,
-            address: item["Address"].S
+            neighborhood: item["neighborhood"].S,
+            address: item["address"].S
         };
     };
 
