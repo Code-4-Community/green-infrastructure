@@ -22,6 +22,30 @@ export class ApplicationsService {
     }
   }
 
+  /**
+   * Updates the status of the given application id.
+   *
+   * @returns the modified application.
+   * @throws an error if an application with the given id is not found.
+   */
+  public async updateApplicationStatus(
+    appId: number,
+    appStatus: ApplicationStatus,
+  ): Promise<ApplicationsModel> {
+    try {
+      const key = { 'Object ID?': { N: appId } };
+      const application = await this.dynamoDbService.updateItem(
+        this.tableName,
+        key,
+        appStatus,
+      );
+
+      return application;
+    } catch (e) {
+      throw new Error('Unable to update application status: ' + e);
+    }
+  }
+
   private mapDynamoDBItemToApplication = (item: {
     [key: string]: any;
   }): ApplicationsModel => {

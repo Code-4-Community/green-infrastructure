@@ -1,7 +1,9 @@
 import {
   DynamoDBClient,
   GetItemCommand,
+  ReturnValue,
   ScanCommand,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
 
@@ -44,5 +46,21 @@ export class DynamoDbService {
     const command = new ScanCommand(params);
     const result = await this.dynamoDbClient.send(command);
     return result.Items;
+  }
+
+  public async updateItem(
+    tableName: string,
+    key: { [key: string]: any },
+    status: string,
+  ): Promise<any> {
+    const params = {
+      TableName: tableName,
+      Key: key,
+      UpdateExpression: `SET status = ${status}`,
+      ReturnValue: 'ALL_NEW',
+    };
+    const command = new UpdateItemCommand(params);
+    const result = await this.dynamoDbClient.send(command);
+    return result.Attributes;
   }
 }
