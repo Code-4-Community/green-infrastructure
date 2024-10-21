@@ -15,6 +15,18 @@ export type SiteModel = {
     address: string
 };
 
+export type SiteInputModel = {
+    siteId: {S: string},
+    siteName: {S: string},
+    siteStatus: {S: string},
+    assetType: {S: string},
+    symbolType: {S: string},
+    siteLatitude: {S: string},
+    siteLongitude: {S: string},
+    neighborhood: {S: string},
+    address: {S: string},
+};
+
 export enum SiteStatus {
     ADOPTED = "Adopted",
     AVAILABLE = "Available",

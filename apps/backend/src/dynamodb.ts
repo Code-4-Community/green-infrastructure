@@ -1,5 +1,6 @@
-import { DynamoDBClient, GetItemCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
-import { Injectable } from "@nestjs/common";
+import { DynamoDBClient, GetItemCommand, PutItemCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
+import { Injectable, Put } from "@nestjs/common";
+import { table } from "console";
 
 @Injectable()
 export class DynamoDbService {
@@ -36,6 +37,30 @@ export class DynamoDbService {
     }
   }
 
+  public async getHighestSiteId(tableName: string): Promise<number | undefined> {
+    const params: any = {
+      TableName: tableName,
+      ProjectionExpression: "siteId" // Project only the siteId attribute
+    };
+  
+    try {
+      const data = await this.dynamoDbClient.send(new ScanCommand(params));
+      const siteIds = data.Items.map(item => parseInt(item.siteId.S, 10)); // Convert to numbers
+  
+      // Handle potential parsing errors
+      const validSiteIds = siteIds.filter(id => !isNaN(id));
+  
+      if (validSiteIds.length === 0) {
+        return undefined; // No valid site IDs found
+      }
+  
+      const highestSiteId = validSiteIds.reduce((max, current) => Math.max(max, current));
+      return highestSiteId;
+    } catch (error) {
+      console.error('DynamoDB Scan Error:', error);
+      throw new Error(`Unable to scan table ${tableName}`);
+    }
+  }
 
   public async getItem(tableName: string, key: { [key: string]: any }): Promise<any> {
     const params = {
@@ -52,4 +77,19 @@ export class DynamoDbService {
     }
   }
 
+  public async postItem(tableName: string, item) {
+    const command = new PutItemCommand({
+      TableName: tableName,
+      Item: item,
+    });
+
+    console.log(command);
+    try {
+      const result = await this.dynamoDbClient.send(command);
+      return result;
+    } catch (error) {
+      console.log(`Error posting item to table ${tableName}`);
+      throw new Error(error);
+    }
+  }
 }
