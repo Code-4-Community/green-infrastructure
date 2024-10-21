@@ -2,6 +2,7 @@ import {
     Controller,
     Get,
     Param,
+    Query
 } from "@nestjs/common";
 import { SiteService } from "./site.service";
 import { SiteModel } from "./site.model";
@@ -16,6 +17,13 @@ export class SiteController {
     ): Promise<SiteModel> {
         return this.siteService.getSite(siteId);
     }  
+
+    @Get()
+    public async getAllSitesByStatus(
+        @Query("status") status: string
+    ): Promise<SiteModel[]> {
+        return this.siteService.getAllSitesByStatus(status);
+    }
 
 
 }
