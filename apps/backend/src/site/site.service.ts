@@ -5,7 +5,7 @@ import { DynamoDbService } from "../dynamodb";
 @Injectable()
 export class SiteService {
 
-    private readonly tableName = 'GIBostonSites';
+    private readonly tableName = 'greenInfraBostonSites';
 
     constructor(private readonly dynamoDbService: DynamoDbService) {}
 
@@ -16,7 +16,7 @@ export class SiteService {
     */
     public async getSite(siteId: number): Promise<SiteModel> {
         try{
-            const key = { 'Object ID?': { N: siteId } };
+            const key = { 'siteId': { S: siteId.toString() } };
             const data = await this.dynamoDbService.getItem(this.tableName, key);
             return(this.mapDynamoDBItemToSite(siteId, data));
         }  
@@ -25,19 +25,54 @@ export class SiteService {
         }
     }
 
+    public async getFilteredSites(filters: { status?: string, symbolType?: string }): Promise<SiteModel[]> {
+        try {
+            const filterExpressionParts = [];
+            const expressionAttributeValues: { [key: string]: any } = {};
+            // add filters based on provided values
+            if (filters.status) {
+                filterExpressionParts.push("siteStatus = :status");
+                expressionAttributeValues[":status"] = { S: filters.status };
+            }
+            if (filters.symbolType) {
+                filterExpressionParts.push("symbolType = :symbolType");
+                expressionAttributeValues[":symbolType"] = { S: filters.symbolType };
+            }
+            const data = await this.dynamoDbService.scanTable(
+                this.tableName, 
+                // if there are filter expression parts, join them with "AND", otherwise pass undefined
+                filterExpressionParts.length > 0 ? filterExpressionParts.join(" AND ") : undefined, 
+                // if there are expression attribute values, pass them, otherwise pass undefined
+                Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined
+            );
+            const sites: SiteModel[] = [];
+            for (let i = 0; i < data.length; i++) {
+                try {
+                    sites.push(this.mapDynamoDBItemToSite(parseInt(data[i]["siteId"].S), data[i]));
+                } catch (error) {
+                    console.error('Error mapping site:', error, data[i]);
+                }
+            }
+            console.log(`Found ${sites.length} sites matching the criteria.`);
+            return sites;
+        } catch (e) {
+            throw new Error("Unable to get site data: " + e);
+        }
+    }
+
     private mapDynamoDBItemToSite = (objectId: number, item: { [key: string]: any }): SiteModel => {
         return {
             siteID: objectId,
-            siteName: item["Asset Name"].S,
+            siteName: item["siteName"].S,
             siteStatus: SiteStatus.AVAILABLE, //placeholder until table is updated
-            assetType: item["Asset Type"].S,
-            symbolType: item["Symbol Type"].S,
-            siteLatitude: item["Lat"].S,
-            siteLongitude: item["Long"].S,
+            assetType: item["assetType"].S,
+            symbolType: item["symbolType"].S,
+            siteLatitude: item["siteLatitude"].S,
+            siteLongitude: item["siteLongitude"].S,
             dateAdopted: new Date(), //placeholder until table is updated
             maintenanceReports: [], //placeholder until table is updated
-            neighborhood: item["Neighborhood"].S,
-            address: item["Address"].S
+            neighborhood: item["neighborhood"].S,
+            address: item["address"].S
         };
     };
 
