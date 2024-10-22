@@ -25,26 +25,9 @@ export class SiteService {
         }
     }
 
-    public async getFilteredSites(filters: { status?: string, symbolType?: string }): Promise<SiteModel[]> {
+    public async getSitesByStatus(status: string): Promise<SiteModel[]> {
         try {
-            const filterExpressionParts = [];
-            const expressionAttributeValues: { [key: string]: any } = {};
-            // add filters based on provided values
-            if (filters.status) {
-                filterExpressionParts.push("siteStatus = :status");
-                expressionAttributeValues[":status"] = { S: filters.status };
-            }
-            if (filters.symbolType) {
-                filterExpressionParts.push("symbolType = :symbolType");
-                expressionAttributeValues[":symbolType"] = { S: filters.symbolType };
-            }
-            const data = await this.dynamoDbService.scanTable(
-                this.tableName, 
-                // if there are filter expression parts, join them with "AND", otherwise pass undefined
-                filterExpressionParts.length > 0 ? filterExpressionParts.join(" AND ") : undefined, 
-                // if there are expression attribute values, pass them, otherwise pass undefined
-                Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined
-            );
+            const data = await this.dynamoDbService.scanTable(this.tableName, "siteStatus = :status", { ":status": { S: status } }  );
             const sites: SiteModel[] = [];
             for (let i = 0; i < data.length; i++) {
                 try {
@@ -52,13 +35,38 @@ export class SiteService {
                 } catch (error) {
                     console.error('Error mapping site:', error, data[i]);
                 }
+
             }
-            console.log(`Found ${sites.length} sites matching the criteria.`);
+            console.log("Found " + sites.length + " \"" + status + "' sites");
             return sites;
-        } catch (e) {
-            throw new Error("Unable to get site data: " + e);
         }
+        catch(e) {
+            throw new Error("Unable to get site by status: "+ e)
+        }
+
     }
+
+    public async getSitesBySymbolType(symbolType: string): Promise<SiteModel[]> {
+        try {
+            const data = await this.dynamoDbService.scanTable(this.tableName, "symbolType = :symbolType", { ":symbolType": { S: symbolType } }  );
+            const sites: SiteModel[] = [];
+            for (let i = 0; i < data.length; i++) {
+                try {
+                    sites.push(this.mapDynamoDBItemToSite(parseInt(data[i]["siteId"].S), data[i]));
+                } catch (error) {
+                    console.error('Error mapping site:', error, data[i]);
+                }
+
+            }
+            console.log("Found " + sites.length + " \"" + symbolType + "' sites");
+            return sites;
+        }
+        catch(e) {
+            throw new Error("Unable to get site by symbol: "+ e)
+        }
+
+    }
+
 
     private mapDynamoDBItemToSite = (objectId: number, item: { [key: string]: any }): SiteModel => {
         return {
