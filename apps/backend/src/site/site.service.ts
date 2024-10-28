@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { SiteModel, SiteStatus } from "./site.model";
+import { SiteInputModel, SiteModel, SiteStatus, SymbolType } from "./site.model";
 import { DynamoDbService } from "../dynamodb"; 
+import { NewSiteInput } from "../dtos/newSiteDTO";
 
 @Injectable()
 export class SiteService {
 
-    private readonly tableName = 'GIBostonSites';
+    private readonly tableName = 'greenInfraBostonSites';
 
     constructor(private readonly dynamoDbService: DynamoDbService) {}
 
@@ -16,7 +17,7 @@ export class SiteService {
     */
     public async getSite(siteId: number): Promise<SiteModel> {
         try{
-            const key = { 'Object ID?': { N: siteId } };
+            const key = { 'siteId': { S: siteId.toString() } };
             const data = await this.dynamoDbService.getItem(this.tableName, key);
             return(this.mapDynamoDBItemToSite(siteId, data));
         }  
@@ -25,20 +26,82 @@ export class SiteService {
         }
     }
 
+    public async postSite(siteData: NewSiteInput) {
+        const siteModel = this.PostInputToSiteModel(siteData);
+        const newId = await this.dynamoDbService.getHighestSiteId(this.tableName) + 1;
+        siteModel.siteId.S = newId.toString();
+        console.log("Using new ID:" + siteModel.siteId.S)
+        try {
+            const result = await this.dynamoDbService.postItem(this.tableName, siteModel);
+            return {...result, newSiteId: newId.toString()};
+        } catch (e) {
+            throw new Error("Unable to post new site: " + e);
+        }
+    }
+
+    public async getFilteredSites(filters: { status?: string, symbolType?: string }): Promise<SiteModel[]> {
+        try {
+            const filterExpressionParts = [];
+            const expressionAttributeValues: { [key: string]: any } = {};
+            // add filters based on provided values
+            if (filters.status) {
+                filterExpressionParts.push("siteStatus = :status");
+                expressionAttributeValues[":status"] = { S: filters.status };
+            }
+            if (filters.symbolType) {
+                filterExpressionParts.push("symbolType = :symbolType");
+                expressionAttributeValues[":symbolType"] = { S: filters.symbolType };
+            }
+            const data = await this.dynamoDbService.scanTable(
+                this.tableName, 
+                // if there are filter expression parts, join them with "AND", otherwise pass undefined
+                filterExpressionParts.length > 0 ? filterExpressionParts.join(" AND ") : undefined, 
+                // if there are expression attribute values, pass them, otherwise pass undefined
+                Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined
+            );
+            const sites: SiteModel[] = [];
+            for (let i = 0; i < data.length; i++) {
+                try {
+                    sites.push(this.mapDynamoDBItemToSite(parseInt(data[i]["siteId"].S), data[i]));
+                } catch (error) {
+                    console.error('Error mapping site:', error, data[i]);
+                }
+            }
+            console.log(`Found ${sites.length} sites matching the criteria.`);
+            return sites;
+        } catch (e) {
+            throw new Error("Unable to get site data: " + e);
+        }
+    }
+
     private mapDynamoDBItemToSite = (objectId: number, item: { [key: string]: any }): SiteModel => {
         return {
             siteID: objectId,
-            siteName: item["Asset Name"].S,
+            siteName: item["siteName"].S,
             siteStatus: SiteStatus.AVAILABLE, //placeholder until table is updated
-            assetType: item["Asset Type"].S,
-            symbolType: item["Symbol Type"].S,
-            siteLatitude: item["Lat"].S,
-            siteLongitude: item["Long"].S,
+            assetType: item["assetType"].S,
+            symbolType: item["symbolType"].S,
+            siteLatitude: item["siteLatitude"].S,
+            siteLongitude: item["siteLongitude"].S,
             dateAdopted: new Date(), //placeholder until table is updated
             maintenanceReports: [], //placeholder until table is updated
-            neighborhood: item["Neighborhood"].S,
-            address: item["Address"].S
+            neighborhood: item["neighborhood"].S,
+            address: item["address"].S
         };
     };
+
+    private PostInputToSiteModel = (input: NewSiteInput): SiteInputModel => {
+        return {
+            siteId: {S: ""},
+            siteName: {S: input.siteName},
+            siteStatus: {S: SiteStatus.AVAILABLE},
+            assetType: {S: input.assetType},
+            symbolType: {S: input.symbolType as SymbolType},
+            siteLatitude: {S: input.siteLatitude},
+            siteLongitude: {S: input.siteLongitude},
+            neighborhood: {S: input.neighborhood},
+            address: {S: input.address},
+        };
+    }
 
 }

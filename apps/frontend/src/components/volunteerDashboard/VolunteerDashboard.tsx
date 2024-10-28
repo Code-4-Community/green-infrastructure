@@ -18,7 +18,13 @@ const boxStyles = {
   fontSize: '30px',
 };
 
-function VolunteerDashboard() {
+interface VolunteerDashboardProps {
+  setMaintenanceChecklistOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function VolunteerDashboard({
+  setMaintenanceChecklistOpen,
+}: VolunteerDashboardProps) {
   return (
     <div
       className="container"
@@ -74,11 +80,20 @@ function VolunteerDashboard() {
               width: '100%',
             }}
           >
-          <Link to="my-adopted-gi" style={{ ...boxStyles, textDecoration: 'none', color: 'inherit', width: '100%', height: '50%' }}>
-            <Box sx={{ ...boxStyles, height: '100%', width: '100%'}}>
-              My Adopted Green Infrastructure
-            </Box>
-          </Link>
+            <Link
+              to="my-adopted-gi"
+              style={{
+                ...boxStyles,
+                textDecoration: 'none',
+                color: 'inherit',
+                width: '100%',
+                height: '50%',
+              }}
+            >
+              <Box sx={{ ...boxStyles, height: '100%', width: '100%' }}>
+                My Adopted Green Infrastructure
+              </Box>
+            </Link>
             <Box
               sx={{
                 display: 'flex',
@@ -87,8 +102,19 @@ function VolunteerDashboard() {
                 gap: '4%',
               }}
             >
-              <Link to="../" style={{ ...boxStyles, textDecoration: 'none', color: 'inherit', width: '100%', height: '100%' }}>
-                  <Box sx={{ ...boxStyles, width: '100%', height: '100%' }}>Adoption Map</Box>
+              <Link
+                to="../"
+                style={{
+                  ...boxStyles,
+                  textDecoration: 'none',
+                  color: 'inherit',
+                  width: '100%',
+                  height: '100%',
+                }}
+              >
+                <Box sx={{ ...boxStyles, width: '100%', height: '100%' }}>
+                  Adoption Map
+                </Box>
               </Link>
               <Box sx={{ ...boxStyles, width: '100%', padding: '3%' }}>
                 Maintenance Guide
@@ -100,7 +126,11 @@ function VolunteerDashboard() {
           className="column2"
           style={{ paddingTop: '2%', paddingBottom: '2%', width: '55%' }}
         >
-          <Box sx={{ ...boxStyles, height: '100%', padding: '8%' }}>
+          <Box
+            sx={{ ...boxStyles, height: '100%', padding: '8%' }}
+            onClick={() => setMaintenanceChecklistOpen(true)}
+            style={{ cursor: 'pointer' }}
+          >
             Maintenance Visit Checklist
           </Box>
         </div>
