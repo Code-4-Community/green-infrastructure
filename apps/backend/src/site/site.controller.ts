@@ -1,11 +1,13 @@
 import {
     Controller,
+    Delete,
     Get,
     Post,
     Body,
     Param,
     Query
-} from "@nestjs/common";
+} 
+from "@nestjs/common";
 import { SiteService } from "./site.service";
 import { SiteModel } from "./site.model";
 import { NewSiteInput } from "../dtos/newSiteDTO";
@@ -14,6 +16,26 @@ import { ApiQuery } from "@nestjs/swagger";
 @Controller("sites")
 export class SiteController {
     constructor(private siteService: SiteService) {}
+
+    @Get("/status/")
+    @ApiQuery({ name: "status", required: true })
+    public async getSitesByStatus(
+        @Query('status') status: string        
+    ): Promise<SiteModel[]> {
+        console.log("status: ", status);
+        return this.siteService.getSitesByStatus(status);
+    }
+
+
+    
+    @Get("/symbolType/")
+    @ApiQuery({ name: "symbolType", required: true })
+    public async getSitesBySymbolType(
+        @Query('symbolType') symbolType: string
+    ): Promise<SiteModel[]> {
+        return this.siteService.getSitesBySymbolType(symbolType);
+    }
+
 
     @Get(":id")
     public async getSite(
@@ -27,15 +49,15 @@ export class SiteController {
         return this.siteService.postSite(siteData);
     }
 
-    @Get()
-    @ApiQuery({ name: 'status', required: false }) // makes query parameter optional
-    @ApiQuery({ name: 'symbol-type', required: false })
-    public async getSites(
-        @Query("status") status?: string,
-        @Query("symbol-type") symbolType?: string
-    ): Promise<SiteModel[]> {
-        return this.siteService.getFilteredSites({ status, symbolType });
+
+    @Delete("/deleteSite/:id")
+    public async deleteSiteById(
+        @Param("id") siteId: number
+    ): Promise<void> {
+        return this.siteService.deleteSite(siteId);
     }
+
+ 
 
 
 }

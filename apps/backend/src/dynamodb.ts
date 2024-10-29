@@ -1,6 +1,7 @@
-import { DynamoDBClient, GetItemCommand, PutItemCommand, ScanCommand, ReturnValue } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, GetItemCommand, ScanCommand, DeleteItemCommand, ReturnValue, PutItemCommand} from "@aws-sdk/client-dynamodb";
 import { Injectable, Put } from "@nestjs/common";
 import { table } from "console";
+
 
 @Injectable()
 export class DynamoDbService {
@@ -14,6 +15,21 @@ export class DynamoDbService {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
       },
     });
+  }
+
+
+  public async deleteItem (tableName: string, key: { [key: string]: any }): Promise<void> {
+    const params = {
+      TableName: tableName,
+      Key: key,
+    };
+
+    try {
+      await this.dynamoDbClient.send(new DeleteItemCommand(params));
+    } catch (error) {
+      console.error('DynamoDB DeleteItem Error:', error);
+      throw new Error(`Unable to delete item from ${tableName}`);
+    }
   }
 
   public async scanTable(tableName: string, filterExpression?: string, expressionAttributeValues?: { [key: string]: any }): Promise<any[]> {
