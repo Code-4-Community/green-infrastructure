@@ -38,7 +38,7 @@ export class SiteService {
                 filterExpressionParts.push("symbolType = :symbolType");
                 expressionAttributeValues[":symbolType"] = { S: filters.symbolType };
             }
-            const data = await this.dynamoDbService.scanTable(
+            const data = await this.dynamoDbService.scanTableV2(
                 this.tableName, 
                 // if there are filter expression parts, join them with "AND", otherwise pass undefined
                 filterExpressionParts.length > 0 ? filterExpressionParts.join(" AND ") : undefined, 
