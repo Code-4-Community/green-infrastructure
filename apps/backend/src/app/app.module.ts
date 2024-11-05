@@ -5,10 +5,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SiteModule } from '../site/site.module';
 import { UserModule } from '../user/user.module'; // Import UserModule
+import { ApplicationsModule } from '../applications/applications.module';
 import { DynamoDbService } from '../dynamodb';
 
 @Module({
-  imports: [SiteModule, UserModule], // Add UserModule here
+  imports: [SiteModule, UserModule, ApplicationsModule], // Add UserModule here
   controllers: [AppController],
   providers: [AppService, DynamoDbService],
 })
