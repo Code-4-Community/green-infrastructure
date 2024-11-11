@@ -1,15 +1,19 @@
 import {
     Controller,
     Get,
+    Delete,
+    Post,
+    Body,
     Param,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { UserModel } from "./user.model";
+import { NewUserInput } from "../dtos/newUserDTO";
 
 /**
  * The controller for user endpoints.
  */
-@Controller("user")
+@Controller("users")
 export class UserController {
     constructor(private userService: UserService) {}
 
@@ -20,6 +24,16 @@ export class UserController {
             return this.userService.getUser(userId);
         }
 
+    @Delete(":id")
+    public async removeUser(
+        @Param("id") userId?: number
+        ): Promise<void> {
+            return this.userService.remove(userId);
+        }
+    @Post("/addVolunteer")
+    public async addVolunteer( @Body() userData: NewUserInput) {
+        return this.userService.postUserVolunteer(userData);
+    }
     
     @Get(":id/sites")
     public async getUserSites(@Param("id") userId?: number): Promise<any> {

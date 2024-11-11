@@ -65,6 +65,31 @@ export class DynamoDbService {
     }
   }
 
+  public async getHighestUserId(tableName: string): Promise<number | undefined> {
+    const params: any = {
+      TableName: tableName,
+      ProjectionExpression: "userId" // Project only the userId attribute
+    };
+
+    try {
+      const data = await this.dynamoDbClient.send(new ScanCommand(params));
+      const userIds = data.Items.map(item => parseInt(item.userId.N, 10)); // Convert to numbers
+
+      // Handle potential parsing errors
+      const validUserIds = userIds.filter(id => !isNaN(id));
+
+      if (validUserIds.length === 0) {
+        return undefined; // No valid user IDs found
+      }
+
+      const highestUserId = validUserIds.reduce((max, current) => Math.max(max, current));
+      return highestUserId;
+    } catch (error) {
+      console.error('DynamoDB Scan Error:', error);
+      throw new Error(`Unable to scan table ${tableName}`);
+    }
+  }
+
   public async getHighestSiteId(
     tableName: string,
   ): Promise<number | undefined> {
