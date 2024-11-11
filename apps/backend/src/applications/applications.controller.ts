@@ -12,6 +12,13 @@ export class ApplicationsController {
     return this.applicationsService.getApplications();
   }
 
+  @Get('nonFirstTimeApplications')
+  public async getNonFirstTimeApplications(): Promise<ApplicationsModel[]> {
+    return (await this.applicationsService.getApplications()).filter(
+      (app) => app.isFirstApplication === false,
+    );
+  }
+
   @Put('applicationStatus/:appId')
   public async changeApplicationStatus(
     @Param('appId') appId: number,
