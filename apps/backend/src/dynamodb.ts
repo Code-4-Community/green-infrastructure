@@ -5,6 +5,7 @@ import {
   DeleteItemCommand,
   PutItemCommand,
   UpdateItemCommand,
+  UpdateItemCommandInput
 } from '@aws-sdk/client-dynamodb';
 import { Injectable, Put } from '@nestjs/common';
 import { table } from 'console';
@@ -44,6 +45,7 @@ export class DynamoDbService {
     tableName: string,
     filterExpression?: string,
     expressionAttributeValues?: { [key: string]: any },
+    expressionAttributeNames? : { [key: string]: any},
   ): Promise<any[]> {
     // By default, scan the entire table
     const params: any = {
@@ -56,6 +58,10 @@ export class DynamoDbService {
     if (expressionAttributeValues) {
       params.ExpressionAttributeValues = expressionAttributeValues;
     }
+    if(expressionAttributeNames) {
+      params.ExpressionAttributeNames = expressionAttributeNames;
+    }
+    
     try {
       const data = await this.dynamoDbClient.send(new ScanCommand(params));
       return data.Items || [];
@@ -168,4 +174,44 @@ export class DynamoDbService {
     const result = await this.dynamoDbClient.send(command);
     return result.Attributes;
   }
+
+  public async updateItemWithExpression(
+    tableName: string,
+    key: { [key: string]: any },
+    updateExpression: string,
+    expressionAttributeValues?: Record<string, any>,
+    expressionAttributeNames?: Record<string, string>,
+): Promise<any> {
+    const params: UpdateItemCommandInput = {
+        TableName: tableName,
+        Key: key,
+        UpdateExpression: updateExpression,
+        ReturnValues: 'ALL_NEW',
+    };
+
+
+    if (expressionAttributeNames) {
+        params.ExpressionAttributeNames = expressionAttributeNames;
+    }
+    
+
+    if (expressionAttributeValues) {
+        params.ExpressionAttributeValues = expressionAttributeValues;
+    }
+
+    try {
+        const command = new UpdateItemCommand(params);
+        const result = await this.dynamoDbClient.send(command);
+        return result.Attributes;
+    } catch (error) {
+        // Log detailed error info
+        console.error("DynamoDB Update Error:", error);
+        throw new Error(`Failed to update item in DynamoDB: ${error.message}`);
+    }
+
+ 
 }
+
+
+}
+

@@ -12,6 +12,17 @@ export type ApplicationsModel = {
   isFirstApplication: boolean;
 };
 
+export type ApplicationInputModel = {
+  appId: {S: string},
+  userId: {S: string},
+  siteId: {S: string},
+  names: {S: string},
+  status: {S: string},
+  dateApplied: {S: string},
+  isFirstApplication: {S: string},
+};
+
+
 export enum ApplicationStatus {
   APPROVED = 'Approved',
   PENDING = 'Pending',

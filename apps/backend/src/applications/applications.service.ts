@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ApplicationsModel } from './applications.model';
+import { ApplicationInputModel, ApplicationsModel } from './applications.model';
 import { DynamoDbService } from '../dynamodb';
 import { ApplicationStatus } from './applications.model';
+// import { NewApplicationInput } from '../dtos/newApplicationsDTO';
 
 @Injectable()
 export class ApplicationsService {
@@ -19,6 +20,22 @@ export class ApplicationsService {
       return data.map(this.mapDynamoDBItemToApplication);
     } catch (e) {
       throw new Error('Unable to retrieve applications: ' + e);
+    }
+  }
+
+  /**
+   * Gets all applications that are first applications.
+   *
+   * @returns a list of all first applications as ApplicationsModel objects.
+   */
+  public async getFirstApplications(): Promise<ApplicationsModel[]> {
+    try {
+      const data = await this.dynamoDbService.scanTable(this.tableName, 'isFirstApplication = :isFirst', {
+        ':isFirst': { BOOL: true },
+      });
+      return data.map(this.mapDynamoDBItemToApplication);
+    } catch (e) {
+      throw new Error('Unable to retrieve first applications: ' + e);
     }
   }
 
