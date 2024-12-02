@@ -1,7 +1,8 @@
-import { Controller, Get, Put, Param, Body } from '@nestjs/common';
+import { Controller, Get, Put, Post, Param, Body } from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { ApplicationsModel } from './applications.model';
 import { ApplicationStatus } from './applications.model';
+// import { NewApplicationInput } from '../dtos/newApplicationsDTO';
 
 @Controller('applications')
 export class ApplicationsController {
@@ -17,6 +18,10 @@ export class ApplicationsController {
     return (await this.applicationsService.getApplications()).filter(
       (app) => app.isFirstApplication === false,
     );
+}
+  @Get('getFirstApplications')
+  public async getFirstApplications(): Promise<ApplicationsModel[]> {
+    return this.applicationsService.getFirstApplications();
   }
 
   @Put('applicationStatus/:appId')
@@ -39,4 +44,6 @@ export class ApplicationsController {
 
     return appToModify;
   }
+
+
 }
