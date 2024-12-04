@@ -2,7 +2,8 @@ import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
 import { ApiParam } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { NewUserInput } from '../dtos/newUserDTO';
-import { UserModel, Role, UserStatus, EditUserModel } from './user.model';
+import { ApiParam } from '@nestjs/swagger';
+import { UserModel, UserStatus, EditUserModel, Role } from './user.model';
 
 /**
  * The controller for user endpoints.
@@ -38,6 +39,13 @@ export class UserController {
   ): Promise<UserModel> {
     return this.userService.editUser(userId, editUserModel);
   }
+  @Put('/editUser/:id')
+  public async editUser(
+    @Param('id') userId?: number,
+    @Body() editUserModel?: EditUserModel,
+  ): Promise<UserModel> {
+    return this.userService.editUser(userId, editUserModel);
+  }
 
   /**
    * Gets users by their status.
@@ -54,7 +62,6 @@ export class UserController {
   public async getUserByStatus(
     @Param('status') status: UserStatus,
   ): Promise<UserModel[]> {
-    console.log(status);
     return this.userService.getUserByStatus(status);
   }
 }

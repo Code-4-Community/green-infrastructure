@@ -23,7 +23,6 @@ export class UserService {
       if (!data) {
         throw new Error(`No user found with id: ${userId}`);
       }
-      console.log(data);
       return this.mapDynamoDBItemToUserModel(userId, data);
     } catch (e) {
       throw new Error(
@@ -56,7 +55,6 @@ export class UserService {
       if (!data) {
         throw new Error(`No user found with id: ${userId}`);
       }
-      console.log(data);
       const siteIds = data['siteIds'].L.map((item) => Number(item.N));
       return siteIds;
     } catch (e) {
