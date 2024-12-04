@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Body, Param, Put } from '@nestjs/common';
-import { ApiParam } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { NewUserInput } from '../dtos/newUserDTO';
 import { ApiParam } from '@nestjs/swagger';
@@ -32,13 +31,6 @@ export class UserController {
     return this.userService.getUserTables(userId);
   }
 
-  @Put('/editUser/:id')
-  public async editUser(
-    @Param('id') userId?: number,
-    @Body() editUserModel?: EditUserModel,
-  ): Promise<UserModel> {
-    return this.userService.editUser(userId, editUserModel);
-  }
   @Put('/editUser/:id')
   public async editUser(
     @Param('id') userId?: number,
