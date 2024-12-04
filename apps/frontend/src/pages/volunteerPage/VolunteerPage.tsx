@@ -18,49 +18,11 @@ export default function VolunteerPage() {
     <div>
       <Navbar />
       <div style={{ marginTop: '50px' }} />
-      <VolunteerDashboard
-        setMaintenanceChecklistOpen={setMaintenanceChecklistOpen}
-      />
+      <VolunteerDashboard/>
       <MaintenanceChecklistPopup
         maintenanceChecklistOpen={maintenanceChecklistOpen}
         setMaintenanceChecklistOpen={setMaintenanceChecklistOpen}
       />
-      <div
-        style={{
-          position: 'relative',
-          width: '88%',
-          margin: '0 auto',
-          paddingBottom: '7%',
-        }}
-      >
-        <Map
-          selectedFeatures={selectedFeatures}
-          selectedStatuses={selectedStatuses}
-          zoom={8}
-        />
-        <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 100 }}>
-          <MapLegend
-            selectedFeatures={selectedFeatures}
-            setSelectedFeatures={setSelectedFeatures}
-            selectedStatuses={selectedStatuses}
-            setSelectedStatuses={setSelectedStatuses}
-            icons={icons}
-          />
-        </div>
-        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 100 }}>
-          <input
-            id="pac-input"
-            type="text"
-            placeholder="Search Box"
-            style={{
-              width: '200px',
-              height: '40px',
-              fontFamily: 'Open Sans',
-              paddingLeft: '15px',
-            }}
-          />
-        </div>
-      </div>
     </div>
   );
 }
