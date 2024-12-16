@@ -28,7 +28,8 @@ export class UserService {
         throw new Error(`No user found with id: ${userId}`);
       }
       console.log(data);
-      return this.mapDynamoDBItemToUserModel(userId, data);
+
+      return this.mapDynamoDBItemToUserModelV2(data);
     } catch (e) {
       throw new Error(
         `Error fetching data for user with id: ${userId}: ${e.message}`,
@@ -125,10 +126,17 @@ export class UserService {
         commands.push(`#s = :status`);
         expressionAttributeValues[':status'] = { S: model.status };
         expressionAttributeNames['#s'] = 'status'; // Define the alias
+
         if (model.status === UserStatus.DENIED) {
+          // Send email if status is denied
           const lambdaParams = {
-            FunctionName: 'giBostonApplicationDenied',
-            Payload: JSON.stringify({ userId: userId.toString() }),
+            FunctionName: 'giSendEmail',
+            Payload: JSON.stringify({
+              firstName: model.firstName
+                ? model.firstName
+                : originalUser.firstName,
+              userEmail: originalUser.email,
+            }),
           };
           const command = new InvokeCommand(lambdaParams);
           await this.lambdaClient.send(command);
