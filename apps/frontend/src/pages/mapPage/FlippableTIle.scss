@@ -26,6 +26,17 @@
   font-size: 16px;
 }
 
+.card.back .card-text {
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+  padding: 12px;
+  font-size: 16px;
+  line-height: 1.5; 
+  height: 100%; 
+}
+
 
 .flip-card-outer {
   width: 320px;
