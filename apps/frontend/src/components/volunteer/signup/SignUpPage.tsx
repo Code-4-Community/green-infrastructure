@@ -6,6 +6,11 @@ import {
   VStack,
   Button,
   IconButton,
+  FormLabel,
+  FormControl,
+  FormErrorMessage,
+  SimpleGrid,
+  Center,
 } from '@chakra-ui/react';
 import { Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,6 +18,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
 
 interface InputField {
   label: string;
@@ -30,40 +37,14 @@ interface InputFieldGroup {
   height: string;
   width: string;
 }
+interface FormField {
+  label: string;
+  type: string;
+}
 
-const personalInfoCheckboxesMap: CheckboxField[] = [
-  {
-    label: 'Signing up as a group representative?',
-  },
-];
-
-const personalInfoInputFieldsMap: InputFieldGroup[] = [
-  {
-    fields: [{ label: 'First Name', width: '250px'}, { label: 'Last Name', width: '350px' }],
-    type: 'double',
-    height: '40px',
-    width: '810px',
-  },
-  {
-    fields: [{ label: 'Email Address' }],
-    type: 'single',
-    height: '40px',
-    width: '380px',
-  },
-  {
-    fields: [{ label: 'Phone Number' }],
-    type: 'single',
-    height: '40px',
-    width: '380px',
-  },
-  {
-    fields: [{ label: 'Birth Year' }],
-    type: 'single',
-    height: '40px',
-    width: '100px',
-  },
-];
-
+interface FormFields {
+  [key: string]: FormField;
+}
 const termsAndConditionsCheckboxesMap: CheckboxField[] = [
   {
     label: 'I have reviewed the General Safety Guidelines',
@@ -75,82 +56,101 @@ const termsAndConditionsCheckboxesMap: CheckboxField[] = [
     label: 'I have read and agree to the Release of Liability',
   },
 ];
+const validationSchema = Yup.object({
+  firstname: Yup.string().required('First name is required'),
+  lastname: Yup.string().required('Last name is required'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  phone: Yup.string()
+    .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits')
+    .required('Phone number is required'),
+  birthyear: Yup.number()
+    .min(1900, 'Invalid birth year')
+    .max(new Date().getFullYear(), 'Invalid birth year')
+    .required('Birth year is required'),
+  groupRepresentative: Yup.boolean(),
+});
+const formFields: FormFields = {
+  firstname: { label: 'First Name', type: 'text' },
+  lastname: { label: 'Last Name', type: 'text' },
+  email: { label: 'Email', type: 'email' },
+  phone: { label: 'Phone Number', type: 'text' },
+  birthyear: { label: 'Birth Year', type: 'number' },
+  groupRepresentative: {
+    label: 'Group representative?',
+    type: 'checkbox',
+  },
+};
 
 function PersonalInfo() {
   return (
-    <Box
-          className="personal-info-box"
-        >
-      <VStack spacing={0} marginBottom={'20px'} borderBottom="2px solid #000000" paddingBottom="20px">
-        {personalInfoCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginBottom={'20px'} alignItems="flex-start">
-            <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">
-              {field.label}
-            </Text>
-            <Checkbox
-              sx={{
-                color: '#808080', // Grey color for the checkbox when not checked
-                '&.Mui-checked': {
-                  color: '#808080', // Grey color for the checkbox when checked
-                },
-                '& .MuiSvgIcon-root': {
-                  fontSize: 23,
-                },
-                padding: '2px',
-                marginLeft: '20px',
-              }}
-            />
-          </HStack>
-        ))}
-        {personalInfoInputFieldsMap.map((group, i) => (
-          <VStack key={i} width="100%" spacing={0} align="flex-start">
-            {group.type === 'double' ? (
-              <HStack width="100%" justifyContent="left" spacing="20%">
-                {group.fields.map((field, j) => (
-                    <VStack key={j} width={field.width}>
-                    <Text
-                      className="label"
-                      alignSelf="flex-start"
-                      fontSize="18px"
-                      fontWeight={600}
-                      marginBottom={-10}
-                      fontFamily="Montserrat"
-                    >
-                      {field.label}
-                    </Text>
-                    <Input
-                      variant="filled"
-                      height={group.height}
-                      placeholder={field.placeholder || 'example'}
-                      width="100%"
+    <Box className="personal-info-box">
+      <Formik
+        initialValues={{
+          firstname: '',
+          lastname: '',
+          email: '',
+          phone: '',
+          birthyear: '',
+        }}
+        validationSchema={validationSchema}
+        onSubmit={(values) => {
+          console.log(values);
+        }}
+      >
+        {({
+          errors,
+          touched,
+          isValid,
+          dirty,
+        }: {
+          errors: { [key: string]: string };
+          touched: { [key: string]: boolean };
+          isValid: boolean;
+          dirty: boolean;
+        }) => (
+          <Form>
+            <Center flexDir={'column'}>
+              <SimpleGrid
+                columns={2}
+                spacing={4}
+                w={'80%'}
+                alignContent={'center'}
+                justifyContent={'center'}
+              >
+                {Object.keys(formFields).map((field) => (
+                  <FormControl
+                    key={field}
+                    isInvalid={!!errors[field] && touched[field]}
+                  >
+                    <FormLabel htmlFor={field}>
+                      {formFields[field].label}
+                    </FormLabel>
+                    <Field
+                      as={Input}
+                      id={field}
+                      name={field}
+                      type={formFields[field].type}
                     />
-                  </VStack>
+                    <FormErrorMessage color='red'>
+                      {errors[field]}
+                    </FormErrorMessage>
+                  </FormControl>
                 ))}
-              </HStack>
-            ) : (
-              <VStack width="100%" align="flex-start">
-                <Text
-                  className="label"
-                  fontSize="18px"
-                  fontWeight={600}
-                  fontFamily="Montserrat"
-                  alignSelf="flex-start"
-                  marginBottom={-10}
-                  marginTop="30px"
-                >
-                  {group.fields[0].label}
-                </Text>
-                <Input
-                  variant="filled"
-                  height={group.height}
-                  placeholder={group.fields[0].placeholder || 'example'}
-                  width={group.width}
-                />
-              </VStack>
-            )}
-          </VStack>
-        ))}
-      </VStack>
+              </SimpleGrid>
+              <Button
+                mt={4}
+                colorScheme="teal"
+                type="submit"
+                isDisabled={!(isValid && dirty)}
+              >
+                Submit
+              </Button>
+            </Center>
+          </Form>
+        )}
+      </Formik>
       <HStack
         className="circle-progress"
         display="flex"
@@ -163,19 +163,35 @@ function PersonalInfo() {
         <CircleOutlinedIcon />
       </HStack>
     </Box>
-  )
+  );
 }
 
 function TermsAndConditions() {
   return (
-    <Box
-          className="terms-and-conditions-box"
-        >
-      <VStack spacing={102} marginTop={'20px'} marginBottom={'20px'}  borderBottom="2px solid #000000" paddingBottom="20px">
+    <Box className="terms-and-conditions-box">
+      <VStack
+        spacing={102}
+        marginTop={'20px'}
+        marginBottom={'20px'}
+        borderBottom="2px solid #000000"
+        paddingBottom="20px"
+      >
         {termsAndConditionsCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginTop={'20px'} alignItems="flex-start">
-            <Text textDecoration="underline" fontSize="18px" fontWeight={600} fontFamily="Montserrat" marginTop={'4px'} >
-                {field.label}
+          <HStack
+            key={i}
+            width="100%"
+            height="100%"
+            marginTop={'20px'}
+            alignItems="flex-start"
+          >
+            <Text
+              textDecoration="underline"
+              fontSize="18px"
+              fontWeight={600}
+              fontFamily="Montserrat"
+              marginTop={'4px'}
+            >
+              {field.label}
             </Text>
             <Checkbox
               sx={{
@@ -220,7 +236,6 @@ export default function SignUpPage({ setShowSignUp }: Props) {
     setShowSignUp(false);
   };
 
-  
   const handleSubmit = () => {
     // You can add form validation logic here if needed
     setIsSubmitted(true);
@@ -238,7 +253,7 @@ export default function SignUpPage({ setShowSignUp }: Props) {
       justifyContent="center"
       bg="#D9D9D9"
       width="80%"
-      height="140%"
+      height="100%"
       zIndex={'200'}
     >
       <IconButton
@@ -305,7 +320,6 @@ export default function SignUpPage({ setShowSignUp }: Props) {
              You can add additional content for the success page 
           </Box>
         )} */}
-        
       </Box>
     </Box>
   );
