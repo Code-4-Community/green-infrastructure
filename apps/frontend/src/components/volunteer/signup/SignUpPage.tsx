@@ -76,7 +76,13 @@ const termsAndConditionsCheckboxesMap: CheckboxField[] = [
   },
 ];
 
-function PersonalInfo() {
+interface PersonalInfoProps {
+  formData: Record<string, string>;
+  setShowSecondPage: (value: boolean) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+function PersonalInfo({ formData, setShowSecondPage, handleChange}: PersonalInfoProps) {
   return (
     <Box
           className="personal-info-box"
@@ -119,10 +125,13 @@ function PersonalInfo() {
                       {field.label}
                     </Text>
                     <Input
+                      name={field.label}
                       variant="filled"
                       height={group.height}
                       placeholder={field.placeholder || 'example'}
                       width="100%"
+                      value={formData[field.label] || ""} // Updated: Bind state
+                      onChange={handleChange}
                     />
                   </VStack>
                 ))}
@@ -141,10 +150,13 @@ function PersonalInfo() {
                   {group.fields[0].label}
                 </Text>
                 <Input
+                  name={group.fields[0].label}
                   variant="filled"
                   height={group.height}
                   placeholder={group.fields[0].placeholder || 'example'}
                   width={group.width}
+                  value={formData[group.fields[0].label] || ""}
+                  onChange={handleChange}
                 />
               </VStack>
             )}
@@ -159,14 +171,20 @@ function PersonalInfo() {
         spacing="30px"
       >
         <CircleIcon />
-        <CircleOutlinedIcon />
+        <IconButton aria-label='secondPage' onClick={() => setShowSecondPage(true)}>
+          <CircleOutlinedIcon />
+        </IconButton>
         <CircleOutlinedIcon />
       </HStack>
     </Box>
   )
 }
 
-function TermsAndConditions() {
+interface TermsAndConditionsProps {
+  setShowSecondPage: (value: boolean) => void;
+}
+
+function TermsAndConditions({ setShowSecondPage }: TermsAndConditionsProps) {
   return (
     <Box
           className="terms-and-conditions-box"
@@ -200,7 +218,9 @@ function TermsAndConditions() {
         alignItems="center"
         spacing="30px"
       >
-        <CircleIcon />
+        <IconButton aria-label='secondPage' onClick={() => setShowSecondPage(false)}>
+          <CircleIcon />
+        </IconButton>
         <CircleIcon />
         <CircleOutlinedIcon />
       </HStack>
@@ -213,18 +233,67 @@ interface Props {
 }
 
 export default function SignUpPage({ setShowSignUp }: Props) {
-  const [isSubmitted, setIsSubmitted] = useState(false); // Step 1
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+  type CreateApplicationInput = {
+    appId: number;
+    userId: number;
+    siteId: number;
+    names: [string];
+    status: string;
+    dateApplied: string;
+    isFirstApplication: string;
+  };
+  
+  type CreateApplicationResponse = {
+    success: boolean;
+    message?: string;
+    data?: any; // Adjust this based on the actual API response structure
+  };
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showSecondPage, setShowSecondPage] = useState(false);
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const navigate = useNavigate();
 
   const closeSignUp = () => {
     setShowSignUp(false);
   };
 
-  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = () => {
-    // You can add form validation logic here if needed
     setIsSubmitted(true);
-    navigate('/success'); // Step 2
+    createApplication()
+    navigate('/success');
+  };
+
+  const createApplication = async () => {
+
+    const payload = {
+      "appId": 15,
+      "userId": 12,
+      "siteId": 3,
+      "names": [formData["First Name"] + " " + formData["Last Name"]],
+      "status": "Pending",
+      "dateApplied": Date.now().toString(),
+      "isFirstApplication": "true"
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/applications`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) throw new Error("Failed to submit application");
+      alert("Application submitted successfully!");
+    } catch (error) {
+      alert("Error");
+    }
   };
 
   return (
@@ -282,29 +351,28 @@ export default function SignUpPage({ setShowSignUp }: Props) {
         </Box>
         <Box className="input-fields-main" width="90%" mt="10px">
           {/* Comment these in and out to display the different pop up pages */}
-          <PersonalInfo />
-          {/* <TermsAndConditions /> */}
+          {!showSecondPage && <PersonalInfo formData={formData} setShowSecondPage={setShowSecondPage} handleChange={handleChange} />}
+          {showSecondPage && <TermsAndConditions setShowSecondPage={setShowSecondPage}/>}
         </Box>
 
         {/* Conditional rendering for the submit button */}
-        {/* {!isSubmitted && (
+        {!isSubmitted && (
           <Button size="large" marginBottom="7%" fontSize="20px" onClick={handleSubmit}
           bottom="10%"
           left="50%"
           transform="translateX(-50%)">
             Submit
           </Button>
-        )} */}
+        )}
 
         {/* Success message */}
-        {/* {isSubmitted && (
+        {isSubmitted && (
           <Box>
             <Text fontSize="24px" fontWeight={600}>
               Thank you for submitting the form!
             </Text>
-             You can add additional content for the success page 
           </Box>
-        )} */}
+        )}
         
       </Box>
     </Box>
