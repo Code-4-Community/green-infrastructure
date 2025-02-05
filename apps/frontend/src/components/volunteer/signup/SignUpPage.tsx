@@ -39,7 +39,10 @@ const personalInfoCheckboxesMap: CheckboxField[] = [
 
 const personalInfoInputFieldsMap: InputFieldGroup[] = [
   {
-    fields: [{ label: 'First Name', width: '250px'}, { label: 'Last Name', width: '350px' }],
+    fields: [
+      { label: 'First Name', width: '250px' },
+      { label: 'Last Name', width: '350px' },
+    ],
     type: 'double',
     height: '40px',
     width: '810px',
@@ -78,12 +81,21 @@ const termsAndConditionsCheckboxesMap: CheckboxField[] = [
 
 function PersonalInfo() {
   return (
-    <Box
-          className="personal-info-box"
-        >
-      <VStack spacing={0} marginBottom={'20px'} borderBottom="2px solid #000000" paddingBottom="20px">
+    <Box className="personal-info-box">
+      <VStack
+        spacing={0}
+        marginBottom={'20px'}
+        borderBottom="2px solid #000000"
+        paddingBottom="20px"
+      >
         {personalInfoCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginBottom={'20px'} alignItems="flex-start">
+          <HStack
+            key={i}
+            width="100%"
+            height="100%"
+            marginBottom={'20px'}
+            alignItems="flex-start"
+          >
             <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">
               {field.label}
             </Text>
@@ -107,7 +119,7 @@ function PersonalInfo() {
             {group.type === 'double' ? (
               <HStack width="100%" justifyContent="left" spacing="20%">
                 {group.fields.map((field, j) => (
-                    <VStack key={j} width={field.width}>
+                  <VStack key={j} width={field.width}>
                     <Text
                       className="label"
                       alignSelf="flex-start"
@@ -163,21 +175,54 @@ function PersonalInfo() {
         <CircleOutlinedIcon />
       </HStack>
     </Box>
-  )
+  );
 }
 
-function TermsAndConditions() {
+function TermsAndConditions({
+  onCheckboxChange,
+}: {
+  onCheckboxChange: (checked: boolean[]) => void;
+}) {
+  const [checkedState, setCheckedState] = useState(
+    new Array(termsAndConditionsCheckboxesMap.length).fill(false),
+  );
+
+  const handleCheckboxChange = (index: number) => {
+    const updatedCheckedState = checkedState.map((item, i) =>
+      i === index ? !item : item,
+    );
+    setCheckedState(updatedCheckedState);
+    onCheckboxChange(updatedCheckedState); // notify parent component
+  };
   return (
-    <Box
-          className="terms-and-conditions-box"
-        >
-      <VStack spacing={102} marginTop={'20px'} marginBottom={'20px'}  borderBottom="2px solid #000000" paddingBottom="20px">
+    <Box className="terms-and-conditions-box">
+      <VStack
+        spacing={102}
+        marginTop={'20px'}
+        marginBottom={'20px'}
+        borderBottom="2px solid #000000"
+        paddingBottom="20px"
+      >
         {termsAndConditionsCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginTop={'20px'} alignItems="flex-start">
-            <Text textDecoration="underline" fontSize="18px" fontWeight={600} fontFamily="Montserrat" marginTop={'4px'} >
-                {field.label}
+          <HStack
+            key={i}
+            width="100%"
+            height="100%"
+            marginTop={'20px'}
+            alignItems="flex-start"
+          >
+            <Text
+              textDecoration="underline"
+              fontSize="18px"
+              fontWeight={600}
+              fontFamily="Montserrat"
+              marginTop={'4px'}
+            >
+              {field.label}
             </Text>
             <Checkbox
+              checked={checkedState[i]}
+              onChange={() => handleCheckboxChange(i)}
               sx={{
                 color: '#808080', // Grey color for the checkbox when not checked
                 '&.Mui-checked': {
@@ -214,17 +259,22 @@ interface Props {
 
 export default function SignUpPage({ setShowSignUp }: Props) {
   const [isSubmitted, setIsSubmitted] = useState(false); // Step 1
+  const [isChecked, setIsChecked] = useState(
+    new Array(termsAndConditionsCheckboxesMap.length).fill(false),
+  );
   const navigate = useNavigate();
 
   const closeSignUp = () => {
     setShowSignUp(false);
   };
 
-  
   const handleSubmit = () => {
-    // You can add form validation logic here if needed
-    setIsSubmitted(true);
-    navigate('/success'); // Step 2
+    if (isChecked.every(Boolean)) {
+      // check all checkboxes checked
+      // You can add form validation logic here if needed
+      setIsSubmitted(true);
+      navigate('/success'); // Step 2
+    }
   };
 
   return (
@@ -282,19 +332,25 @@ export default function SignUpPage({ setShowSignUp }: Props) {
         </Box>
         <Box className="input-fields-main" width="90%" mt="10px">
           {/* Comment these in and out to display the different pop up pages */}
-          <PersonalInfo />
-          {/* <TermsAndConditions /> */}
+          {/*<PersonalInfo /> */}
+          {/*<TermsAndConditions onCheckboxChange={setIsChecked} /> */}
         </Box>
 
         {/* Conditional rendering for the submit button */}
-        {/* {!isSubmitted && (
-          <Button size="large" marginBottom="7%" fontSize="20px" onClick={handleSubmit}
-          bottom="10%"
-          left="50%"
-          transform="translateX(-50%)">
+        {/*{!isSubmitted && (
+          <Button
+            size="large"
+            marginBottom="7%"
+            fontSize="20px"
+            onClick={handleSubmit}
+            bottom="10%"
+            left="50%"
+            transform="translateX(-50%)"
+            isDisabled={!isChecked.every(Boolean)}
+          >
             Submit
           </Button>
-        )} */}
+        )}/*}
 
         {/* Success message */}
         {/* {isSubmitted && (
@@ -305,7 +361,6 @@ export default function SignUpPage({ setShowSignUp }: Props) {
              You can add additional content for the success page 
           </Box>
         )} */}
-        
       </Box>
     </Box>
   );
