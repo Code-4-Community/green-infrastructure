@@ -11,301 +11,200 @@ import { Checkbox } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CircleIcon from '@mui/icons-material/Circle';
-import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
-
-interface InputField {
-  label: string;
-  width?: string;
-  placeholder?: string;
-}
-
-interface CheckboxField {
-  label: string;
-}
-
-interface InputFieldGroup {
-  fields: InputField[];
-  type?: 'single' | 'double'; // 'single' for single column, 'double' for double column row
-  height: string;
-  width: string;
-}
-
-const personalInfoCheckboxesMap: CheckboxField[] = [
-  {
-    label: 'Signing up as a group representative?',
-  },
-];
-
-const personalInfoInputFieldsMap: InputFieldGroup[] = [
-  {
-    fields: [{ label: 'First Name', width: '250px'}, { label: 'Last Name', width: '350px' }],
-    type: 'double',
-    height: '40px',
-    width: '810px',
-  },
-  {
-    fields: [{ label: 'Email Address' }],
-    type: 'single',
-    height: '40px',
-    width: '380px',
-  },
-  {
-    fields: [{ label: 'Phone Number' }],
-    type: 'single',
-    height: '40px',
-    width: '380px',
-  },
-  {
-    fields: [{ label: 'Birth Year' }],
-    type: 'single',
-    height: '40px',
-    width: '100px',
-  },
-];
-
-const termsAndConditionsCheckboxesMap: CheckboxField[] = [
-  {
-    label: 'I have reviewed the General Safety Guidelines',
-  },
-  {
-    label: 'I have read and agree to the Terms of Use and Privacy Policy',
-  },
-  {
-    label: 'I have read and agree to the Release of Liability',
-  },
-];
-
-function PersonalInfo() {
-  return (
-    <Box
-          className="personal-info-box"
-        >
-      <VStack spacing={0} marginBottom={'20px'} borderBottom="2px solid #000000" paddingBottom="20px">
-        {personalInfoCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginBottom={'20px'} alignItems="flex-start">
-            <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">
-              {field.label}
-            </Text>
-            <Checkbox
-              sx={{
-                color: '#808080', // Grey color for the checkbox when not checked
-                '&.Mui-checked': {
-                  color: '#808080', // Grey color for the checkbox when checked
-                },
-                '& .MuiSvgIcon-root': {
-                  fontSize: 23,
-                },
-                padding: '2px',
-                marginLeft: '20px',
-              }}
-            />
-          </HStack>
-        ))}
-        {personalInfoInputFieldsMap.map((group, i) => (
-          <VStack key={i} width="100%" spacing={0} align="flex-start">
-            {group.type === 'double' ? (
-              <HStack width="100%" justifyContent="left" spacing="20%">
-                {group.fields.map((field, j) => (
-                    <VStack key={j} width={field.width}>
-                    <Text
-                      className="label"
-                      alignSelf="flex-start"
-                      fontSize="18px"
-                      fontWeight={600}
-                      marginBottom={-10}
-                      fontFamily="Montserrat"
-                    >
-                      {field.label}
-                    </Text>
-                    <Input
-                      variant="filled"
-                      height={group.height}
-                      placeholder={field.placeholder || 'example'}
-                      width="100%"
-                    />
-                  </VStack>
-                ))}
-              </HStack>
-            ) : (
-              <VStack width="100%" align="flex-start">
-                <Text
-                  className="label"
-                  fontSize="18px"
-                  fontWeight={600}
-                  fontFamily="Montserrat"
-                  alignSelf="flex-start"
-                  marginBottom={-10}
-                  marginTop="30px"
-                >
-                  {group.fields[0].label}
-                </Text>
-                <Input
-                  variant="filled"
-                  height={group.height}
-                  placeholder={group.fields[0].placeholder || 'example'}
-                  width={group.width}
-                />
-              </VStack>
-            )}
-          </VStack>
-        ))}
-      </VStack>
-      <HStack
-        className="circle-progress"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        spacing="30px"
-      >
-        <CircleIcon />
-        <CircleOutlinedIcon />
-        <CircleOutlinedIcon />
-      </HStack>
-    </Box>
-  )
-}
-
-function TermsAndConditions() {
-  return (
-    <Box
-          className="terms-and-conditions-box"
-        >
-      <VStack spacing={102} marginTop={'20px'} marginBottom={'20px'}  borderBottom="2px solid #000000" paddingBottom="20px">
-        {termsAndConditionsCheckboxesMap.map((field, i) => (
-          <HStack key={i} width="100%" height="100%" marginTop={'20px'} alignItems="flex-start">
-            <Text textDecoration="underline" fontSize="18px" fontWeight={600} fontFamily="Montserrat" marginTop={'4px'} >
-                {field.label}
-            </Text>
-            <Checkbox
-              sx={{
-                color: '#808080', // Grey color for the checkbox when not checked
-                '&.Mui-checked': {
-                  color: '#808080', // Grey color for the checkbox when checked
-                },
-                '& .MuiSvgIcon-root': {
-                  fontSize: 32,
-                },
-                padding: '2px',
-                marginLeft: '20px',
-              }}
-            />
-          </HStack>
-        ))}
-      </VStack>
-      <HStack
-        className="circle-progress"
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        spacing="30px"
-      >
-        <CircleIcon />
-        <CircleIcon />
-        <CircleOutlinedIcon />
-      </HStack>
-    </Box>
-  );
-}
 
 interface Props {
   setShowSignUp: (value: boolean) => void;
 }
 
+function PersonalInfo() {
+  const [isGroupRepresentative, setIsGroupRepresentative] = useState(false);
+
+  return (
+    <Box className="personal-info-box">
+      <VStack spacing={5} marginBottom={'20px'} borderBottom="2px solid #000000" paddingBottom="20px">
+        
+        {/* Checkbox for Group Representative */}
+        <HStack width="100%" alignItems="center">
+          <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">
+            Signing up as a group representative?
+          </Text>
+          <Checkbox
+            checked={isGroupRepresentative}
+            onChange={() => setIsGroupRepresentative(!isGroupRepresentative)}
+            sx={{
+              color: '#808080',
+              '&.Mui-checked': { color: '#808080' },
+              '& .MuiSvgIcon-root': { fontSize: 23 },
+              padding: '2px',
+              marginLeft: '10px',
+            }}
+          />
+        </HStack>
+
+        <HStack width="100%" spacing={10} align="start">
+          
+          {/* Left Column: First Name, Email, Phone, Birth Year */}
+          <VStack width="50%" align="start" spacing={5}>
+            <VStack width="100%" align="start">
+              <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">First Name</Text>
+              <Input variant="filled" height="40px" width="100%" />
+            </VStack>
+            
+            <VStack width="100%" align="start">
+              <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">Email Address</Text>
+              <Input variant="filled" height="40px" width="100%" />
+            </VStack>
+
+            <VStack width="100%" align="start">
+              <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">Phone Number</Text>
+              <Input variant="filled" height="40px" width="100%" />
+            </VStack>
+
+            <VStack width="100px" align="start">
+              <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">Birth Year</Text>
+              <Input variant="filled" height="40px" width="100%" />
+            </VStack>
+          </VStack>
+
+          {/* Right Column: Last Name and Group Members */}
+          <VStack width="50%" align="start" spacing={5}>
+            <VStack width="100%" align="start">
+              <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">Last Name</Text>
+              <Input variant="filled" height="40px" width="100%" />
+            </VStack>
+
+            {/* Conditionally render Group Members below Last Name if checked */}
+            {isGroupRepresentative && (
+              <VStack width="100%" align="start">
+                <Text fontSize="18px" fontWeight={600} fontFamily="Montserrat">Group Members</Text>
+                <Input
+                  as="textarea" 
+                  variant="filled"
+                  height="230px"
+                  width="100%"
+                  placeholder="First, Last Name..."
+                  resize="none" 
+                  sx={{ paddingTop: '10px' }} // Ensures text starts at the top
+                />
+              </VStack>
+            )}
+          </VStack>
+
+        </HStack>
+
+      </VStack>
+    </Box>
+  );
+}
+
+function TermsAndConditions() {
+  return (
+    <Box className="terms-and-conditions-box">
+      <VStack spacing={6} marginTop={'20px'} marginBottom={'20px'} borderBottom="2px solid #000000" paddingBottom="20px">
+        {[
+          'I have reviewed the General Safety Guidelines',
+          'I have read and agree to the Terms of Use and Privacy Policy',
+          'I have read and agree to the Release of Liability',
+        ].map((label, i) => (
+          <HStack key={i} width="100%" alignItems="center">
+            <Text textDecoration="underline" fontSize="18px" fontWeight={600} fontFamily="Montserrat">
+              {label}
+            </Text>
+            <Checkbox
+              sx={{
+                color: '#808080',
+                '&.Mui-checked': { color: '#808080' },
+                '& .MuiSvgIcon-root': { fontSize: 32 },
+                padding: '2px',
+                marginLeft: '20px',
+              }}
+            />
+          </HStack>
+        ))}
+      </VStack>
+    </Box>
+  );
+}
+
 export default function SignUpPage({ setShowSignUp }: Props) {
-  const [isSubmitted, setIsSubmitted] = useState(false); // Step 1
   const navigate = useNavigate();
+  const [step, setStep] = useState(1);
 
   const closeSignUp = () => {
     setShowSignUp(false);
   };
 
-  
+  const handleNext = () => {
+    if (step < 2) setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    if (step > 1) setStep(step - 1);
+  };
+
   const handleSubmit = () => {
-    // You can add form validation logic here if needed
-    setIsSubmitted(true);
-    navigate('/success'); // Step 2
+    navigate('/success');
   };
 
   return (
-    <Box
-      className="outermost-box"
-      position="absolute"
-      top="10%"
-      left="10%"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      bg="#D9D9D9"
-      width="80%"
-      height="140%"
-      zIndex={'200'}
-    >
-      <IconButton
-        aria-label="close"
-        size="small"
-        position="absolute"
-        top="10px"
-        right="10px"
-        onClick={closeSignUp}
-      >
+    <Box className="outermost-box" position="absolute" top="10%" left="10%" display="flex" alignItems="center" justifyContent="center" bg="#D9D9D9" width="80%" height="140%" zIndex={'200'}>
+      <IconButton aria-label="close" size="small" position="absolute" top="10px" right="10px" onClick={closeSignUp}>
         <CloseIcon />
       </IconButton>
-      <Box
-        className="inner-box"
-        bg="#FFFDFD"
-        height="90%"
-        width="90%"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="space-evenly"
-        paddingTop={'30px'}
-      >
-        <Box
-          className="header-box"
-          height="5%"
-          width="90%"
-          borderBottom="2px solid #000000"
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Text
-            fontFamily="Montserrat"
-            fontSize="28px"
-            fontWeight={700}
-            paddingBottom={'30px'}
-          >
+      <Box className="inner-box" bg="#FFFDFD" height="90%" width="90%" display="flex" flexDirection="column" alignItems="center" justifyContent="space-evenly" paddingTop={'30px'}>
+        <Box className="header-box" height="5%" width="90%" borderBottom="2px solid #000000" display="flex" justifyContent="center" alignItems="center">
+          <Text fontFamily="Montserrat" fontSize="28px" fontWeight={700} paddingBottom={'30px'}>
             Welcome, Volunteer!
           </Text>
         </Box>
         <Box className="input-fields-main" width="90%" mt="10px">
-          {/* Comment these in and out to display the different pop up pages */}
-          <PersonalInfo />
-          {/* <TermsAndConditions /> */}
+          {step === 1 && <PersonalInfo />}
+          {step === 2 && <TermsAndConditions />}
         </Box>
 
-        {/* Conditional rendering for the submit button */}
-        {/* {!isSubmitted && (
-          <Button size="large" marginBottom="7%" fontSize="20px" onClick={handleSubmit}
-          bottom="10%"
-          left="50%"
-          transform="translateX(-50%)">
-            Submit
-          </Button>
-        )} */}
+        {/* Buttons for navigation */}
+        <HStack width="100%" justifyContent="space-between" marginBottom="7%" paddingX="5%">
+          {step > 1 ? (
+            <Button 
+              onClick={handleBack} 
+              fontSize="18px" 
+              bg="#4A4A4A" 
+              color="white" 
+              _hover={{ bg: "#2E2E2E" }}
+              width="150px"  
+            >
+              ← Back
+            </Button>
+          ) : (
+            <Box width="150px" /> 
+          )}
 
-        {/* Success message */}
-        {/* {isSubmitted && (
-          <Box>
-            <Text fontSize="24px" fontWeight={600}>
-              Thank you for submitting the form!
-            </Text>
-             You can add additional content for the success page 
-          </Box>
-        )} */}
-        
+          {step < 2 ? (
+            <Button 
+              onClick={handleNext} 
+              fontSize="18px" 
+              bg="#4A4A4A" 
+              color="white" 
+              _hover={{ bg: "#2E2E2E" }} 
+              width="150px"
+              alignSelf="flex-end"
+            >
+              Next →
+            </Button>
+          ) : (
+            <Button 
+              onClick={handleSubmit} 
+              fontSize="18px" 
+              bg="#E74C3C" 
+              color="white" 
+              _hover={{ bg: "#C0392B" }} 
+              width="150px"
+              alignSelf="flex-end"
+            >
+              Submit
+            </Button>
+          )}
+        </HStack>
       </Box>
     </Box>
   );
