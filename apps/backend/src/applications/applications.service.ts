@@ -3,11 +3,15 @@ import { ApplicationInputModel, ApplicationsModel } from './applications.model';
 import { DynamoDbService } from '../dynamodb';
 import { ApplicationStatus } from './applications.model';
 import { NewApplicationInput } from '../dtos/newApplicationsDTO';
+import { LambdaService } from '../lambda';
+import { UserService } from '../user/user.service';
+import { SiteService } from '../site/site.service';
 
 @Injectable()
 export class ApplicationsService {
   private readonly tableName = 'gibostonApplications';
-  constructor(private readonly dynamoDbService: DynamoDbService) {}
+  constructor(private readonly dynamoDbService: DynamoDbService, private readonly lambdaService:LambdaService, 
+    private readonly userService: UserService, private readonly siteService: SiteService) {}
 
   /**
    * Gets all applications.
@@ -75,6 +79,26 @@ export class ApplicationsService {
     console.log("Received application data:", applicationData);
     try {
         const result = await this.dynamoDbService.postItem(this.tableName, applicationModel);
+
+        if (result.$metadata.httpStatusCode !== 200) {
+            throw new Error('Error posting application');
+        }
+        const user = await this.userService.getUser(applicationData.userId);
+        const site = await this.siteService.getSite(applicationData.siteId);
+        const name = user.firstName;
+        const email = user.email;
+ 
+        const siteName = site.siteName;
+        const timeFrame = "30 days"
+        const emailData = {"firstName":name, "userEmail":email, "siteName":siteName, "timeFrame":timeFrame};
+
+
+
+        const lambdaResult = await this.lambdaService.invokeLambda('giSendApplicationConfirmation', emailData );
+        console.log("Lambda result: ", lambdaResult);
+
+
+        
         return {...result, newApplicationId: newId.toString()};
     } catch (e) {
         throw new Error("Unable to post new application: " + e);
