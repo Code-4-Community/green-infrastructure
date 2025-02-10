@@ -8,14 +8,38 @@
   letter-spacing: 0em;
 }
 
-.icon-placeholder {
+.card-front {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-shrink: 0;
+  text-align: left;
+  justify-content: center;
+  padding-left: 25px;
+}
+
+.card-front-icon {
+  @extend .card-front;
   width: 300px;
   height: 110px;
+  padding-top: 45px;
   border-radius: 50%;
-  display: flex;
-  padding-left: 30px;
-  padding-top: 40px;
+}
 
+.card-front-text {
+  @extend .card-front;
+  padding: 12px;
+  width: 274px;
+  height: 69px;
+  font-style: italic;
+  font-weight: 200;
+  padding-left: 25px;
+  padding-top: 55px;
+}
+
+.card-front-line {
+  @extend .card-front;
+  padding-top: 50px;
 }
 
 .card-text {
