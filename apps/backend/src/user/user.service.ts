@@ -3,14 +3,14 @@ import { UserModel, EditUserModel } from "./user.model";
 import { DynamoDbService } from "../dynamodb";
 import { UserInputModel, UserStatus, Role } from "./user.model";
 import { NewUserInput } from "../dtos/newUserDTO";
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 @Injectable()
 export class UserService {
 
     private readonly tableName = 'gibostonUsers';
-    constructor(private readonly dynamoDbService: DynamoDbService) {}
-
- 
+    private readonly lambdaClient: LambdaClient = new LambdaClient({ region: process.env.AWS_REGION });
+    constructor(private readonly dynamoDbService: DynamoDbService) { }
 
     /**
      * Gets a user's information based on the user's id.
@@ -76,8 +76,6 @@ export class UserService {
 
             const originalUser = await this.getUser(userId);
 
-
-
             if (model.firstName) {
                 commands.push(`firstName = :firstName`);
                 expressionAttributeValues[":firstName"] = { S: model.firstName };
@@ -112,13 +110,25 @@ export class UserService {
                 if (!siteCheckResult) {
                     return {statusCode: 400, message: "Site does not exist"};
                 }
-              }
+            }
 
-              if (model.status) {
+            if (model.status) {
                 commands.push(`#s = :status`);
                 expressionAttributeValues[":status"] = { S: model.status };
-                expressionAttributeNames["#s"] = "status"; // Define the alias
-              }
+                expressionAttributeNames["#s"] = "status";
+                if (model.status === UserStatus.DENIED) {
+                    // Send email if status is denied
+                    const lamdaParams = {
+                        FunctionName: 'giSendEmail',
+                        Payload: JSON.stringify({
+                            firstName: model.firstName ? model.firstName : originalUser.firstName,
+                            userEmail: originalUser.email
+                        }),
+                    }
+                    const command = new InvokeCommand(lamdaParams);
+                    await this.lambdaClient.send(command);
+                }
+            }
 
 
             // Make sure commands aren't empty
