@@ -4,8 +4,7 @@ import { UserController } from "./user.controller";
 import { DynamoDbService } from "../dynamodb";
 
 @Module({
-    imports: [],
-    providers: [UserService,DynamoDbService],
+    providers: [UserService, DynamoDbService],
     controllers: [UserController],
     exports: [UserService],
 })

@@ -10,7 +10,7 @@ export class UserService {
     private readonly tableName = 'gibostonUsers';
     constructor(private readonly dynamoDbService: DynamoDbService) {}
 
- 
+
 
     /**
      * Gets a user's information based on the user's id.
