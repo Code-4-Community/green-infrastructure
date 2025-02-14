@@ -45,6 +45,43 @@ interface MapProps {
   selectedFeatures: string[];
   selectedStatuses: string[];
 }
+function filterMarkers(
+  selectedFeatures: string[],
+  selectedStatuses: string[],
+  markers: google.maps.Marker[],
+  map: google.maps.Map,
+) {
+  let tempMarkers: google.maps.Marker[] = [];
+  if (selectedFeatures.length === 0) {
+    markers.forEach((marker: google.maps.Marker) => {
+      marker.setMap(map);
+    });
+    tempMarkers = markers;
+  } else {
+    markers.forEach((marker: google.maps.Marker) => marker.setMap(null));
+    markers.forEach((marker: google.maps.Marker) => {
+      const featureType = marker.get('featureType');
+      if (selectedFeatures.includes(featureType)) {
+        marker.setMap(map);
+        tempMarkers.push(marker);
+      }
+    });
+  }
+
+  if (selectedStatuses.length === 0) {
+    tempMarkers.forEach((marker: google.maps.Marker) => {
+      marker.setMap(map);
+    });
+  } else {
+    tempMarkers.forEach((marker: google.maps.Marker) => marker.setMap(null));
+    tempMarkers.forEach((marker: google.maps.Marker) => {
+      const status = marker.get('status');
+      if (selectedStatuses.includes(status)) {
+        marker.setMap(map);
+      }
+    });
+  }
+}
 
 const Map: React.FC<MapProps> = ({ zoom, selectedFeatures, selectedStatuses }) => {
   const mapRef = useRef<HTMLDivElement | null>(null);

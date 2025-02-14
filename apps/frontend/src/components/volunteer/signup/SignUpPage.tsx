@@ -12,6 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 // CHANGED: Props now include the siteId.
 interface Props {
   setShowSignUp: (value: boolean) => void;
