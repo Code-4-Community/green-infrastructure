@@ -25,7 +25,7 @@ export type UserInputModel = {
     zipCode: {S: string},
     birthDate: {S: string},
     role: {S: string},
-    siteIds: {S: string},
+    siteIds: {L: {N: string}[] },
     status: {S: string}
 };
 export class EditUserModel {
