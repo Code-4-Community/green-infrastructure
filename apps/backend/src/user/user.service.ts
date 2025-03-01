@@ -187,7 +187,9 @@ export class UserService {
     objectId: number,
     data?: { [key: string]: any },
   ): UserModel {
-    const siteIds = data['siteIds'].L.map((item) => Number(item.N)) ?? [];
+    const siteIds = Array.isArray(data['siteIds']?.L)
+      ? data['siteIds'].L.map((item) => Number(item.N))
+      : [];
 
     return {
       userId: objectId,

@@ -76,10 +76,11 @@ export class ApplicationsService {
         appStatus,
       );
       if (appStatus === ApplicationStatus.APPROVED) {
-        const user = await this.userService.getUser(application.userId);
-        const site = await this.siteService.getSite(application.siteId);
+        const user = await this.userService.getUser(application.userId.N);
+        const site = await this.siteService.getSite(application.siteId.N);
         const name = user.firstName;
         const email = user.email;
+        const userId = user.userId;
 
         const siteName = site.siteName;
         const timeFrame = '30 days';
@@ -88,6 +89,7 @@ export class ApplicationsService {
           userEmail: email,
           siteName: siteName,
           timeFrame: timeFrame,
+          userId: userId,
         };
         const lambdaResult = await this.lambdaService.invokeLambda(
           'giSendApplicationApproved',
@@ -130,6 +132,7 @@ export class ApplicationsService {
         userEmail: email,
         siteName: siteName,
         timeFrame: timeFrame,
+        userId: applicationData.userId,
       };
 
       const lambdaResult = await this.lambdaService.invokeLambda(
