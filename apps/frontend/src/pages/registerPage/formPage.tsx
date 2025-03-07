@@ -10,6 +10,7 @@ import {
 import { useState } from 'react';
 import InfoIcon from '@mui/icons-material/Info';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import axios from 'axios';
 
 interface FormPageProps {
   setIsSubmitted: (value: boolean) => void;
@@ -18,6 +19,14 @@ interface FormPageProps {
 const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [error, setError] = useState('');
+
+  const UserStatus = {
+    APPROVED: 'Approved',
+    PENDING: 'Pending',
+    DENIED: 'Denied',
+  };
 
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -25,6 +34,28 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
 
   const handleToggleRePassword = () => {
     setShowRePassword((prev) => !prev);
+  };
+
+  const handleSubmit = async () => {
+    if (!userId.trim()) {
+      setError('User ID required');
+      return;
+    }
+    //console.log('UserID: ', userId);
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/users/editUser/${userId}`,
+        { status: UserStatus.APPROVED },
+      );
+
+      setIsSubmitted(true);
+
+      //console.log('Response:', response.data);
+    } catch (e) {
+      setError('Failed to approve user. Please try again.');
+      console.error('Error: ', e);
+    }
   };
 
   return (
@@ -51,11 +82,7 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
         Volunteer Registration
       </h1>
       <form>
-        <Box
-          display="flex"
-          alignItems="center"
-          marginTop={5}
-        >
+        <Box display="flex" alignItems="center" marginTop={5}>
           <Text
             fontFamily="Montserrat"
             fontSize="20px"
@@ -85,6 +112,8 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
           fullWidth
           margin="none"
           size="small"
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
           InputLabelProps={{
             style: { fontFamily: 'Montserrat', fontWeight: 600 },
           }}
@@ -196,9 +225,7 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
           textTransform: 'none',
           marginTop: '40px',
         }}
-        onClick={() => {
-          setIsSubmitted(true);
-        }}
+        onClick={handleSubmit}
       >
         Create Account
       </Button>
