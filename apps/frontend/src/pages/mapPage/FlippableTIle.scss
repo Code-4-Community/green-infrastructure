@@ -4,18 +4,43 @@
   font-family: Lora;
   font-size: 40px;
   font-weight: 500;
-  line-height: 51px;
+  //line-height: 51px;
+  line-height: 30px;
   letter-spacing: 0em;
 }
 
-.icon-placeholder {
+.card-front {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-shrink: 0;
+  text-align: left;
+  justify-content: center;
+  padding-left: 25px;
+}
+
+.card-front-icon {
+  @extend .card-front;
   width: 300px;
   height: 110px;
+  padding-top: 45px;
   border-radius: 50%;
-  display: flex;
-  padding-left: 30px;
-  padding-top: 40px;
+}
 
+.card-front-text {
+  @extend .card-front;
+  padding: 12px;
+  width: 274px;
+  height: 69px;
+  font-style: italic;
+  font-weight: 200;
+  padding-left: 25px;
+  padding-top: 55px;
+}
+
+.card-front-line {
+  @extend .card-front;
+  padding-top: 50px;
 }
 
 .card-text {
@@ -26,11 +51,26 @@
   font-size: 16px;
 }
 
+.card.back .card-text {
+  display: flex;
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+  padding: 12px;
+  font-size: 16px;
+  line-height: 1.5; 
+  height: 100%; 
+}
+
 
 .flip-card-outer {
-  width: 320px;
-  height: 320px;
-  margin: 25px 0;
+  // min-width: 160px;
+  // max-width: 240px;
+  // min-height: 160px;
+  // max-height: 240px;
+  width: 100%;
+  height: 100%;
+  //margin: 25px 0px;
 
   &.focus-trigger:focus {
     outline: 5px solid greenyellow;
@@ -39,7 +79,7 @@
 
   .flip-card-inner {
     transform-style: preserve-3d;
-    transition: .5s linear .1s;
+    transition: 0.5s linear 0.1s;
     position: relative;
     width: inherit;
     height: inherit;
@@ -51,7 +91,7 @@
     &.showBack {
       transform: rotateY(180deg);
     }
-  
+
     .card {
       backface-visibility: hidden;
       position: absolute;
@@ -59,20 +99,27 @@
       left: 0;
       width: 100%;
       height: 100%;
-  
+
       &.front {
         transform: rotateY(0);
-        background-color: #288BE4;
-        color: #FFFDFD;
+        background-color: #288be4;
+        color: #fffdfd;
       }
 
       &.back {
         transform: rotateY(180deg);
         background-color: #f2f2f2;
-        color: #288BE4;
+        color: #288be4;
       }
 
       border-radius: 0;
     }
+  }
+
+  .green-box {
+    background-color: #2d6a4f !important;
+    color: white;
+    width: 75px !important;
+    height: 100px !important;
   }
 }

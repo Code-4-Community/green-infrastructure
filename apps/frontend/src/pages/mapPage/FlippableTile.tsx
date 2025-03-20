@@ -37,11 +37,11 @@ export default function FlipCard({ ...props }) {
             backgroundSize: 'cover',
           }}
         >
-          <div className="icon-placeholder col-md-4">
+          <div className="card-front-icon col-md-4">
             {card.icon(isHovered)}
           </div>
-          <p className="card-text">{card.front}</p>
-          <p className="card-text">{generateRedline()}</p>
+          <p className="card-front-text">{card.front}</p>
+          <p className="card-front-line">{generateRedline()}</p>
         </div>
         <div className="card back">
           <p className="card-text text-center">{card.back}</p>

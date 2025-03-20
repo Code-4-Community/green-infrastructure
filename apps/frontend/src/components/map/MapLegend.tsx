@@ -4,7 +4,7 @@ import { ReactNode, useState } from 'react';
 import { SITE_STATUS_ROADMAP } from '../../constants';
 import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 import { Collapse, Grid } from '@mui/material';
-import ArrowBackIosIcon  from '@mui/icons-material/ArrowBackIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import generateCircleSVG from '../../images/markers/circle';
 import generateDiamondSVG from '../../images/markers/diamond';
 import generateSquareSVG from '../../images/markers/square';
@@ -16,7 +16,9 @@ import circleSVG from '../../images/markers/circle.svg';
 import diamondSVG from '../../images/markers/diamond.svg';
 import starSVG from '../../images/markers/star.svg';
 import pentagonSVG from '../../images/markers/pentagon.svg';
-import { CheckboxOptionType, CheckboxValueType } from 'antd/es/checkbox/Group';
+import { CheckboxOptionType } from 'antd/es/checkbox/Group';
+
+type CheckboxValueType = string | number | boolean;
 
 const Title = styled.h1`
 font-size: 15px;
@@ -29,15 +31,15 @@ text-align: center;
 `;
 
 const Heading = styled.h2`
-color: rgba(88, 88, 91, 1);
-text-align: center;
-font-family: Lora;
-font-size: 15px;
-margin-top: 0px;
-font-weight: 400;
-line-height: 19px;
-letter-spacing: 0em;
-text-align: center;
+  color: rgba(88, 88, 91, 1);
+  text-align: center;
+  font-family: Lora;
+  font-size: 15px;
+  margin-top: 0px;
+  font-weight: 400;
+  line-height: 19px;
+  letter-spacing: 0em;
+  text-align: center;
 `;
 
 const MapLegendContainer = styled.div<{ isVisible: boolean }>`
@@ -69,15 +71,15 @@ const LegendImage = styled(Image)`
 `;
 
 const LegendText = styled.div`
-margin-left: 15px;
+  margin-left: 15px;
 `;
 
 const FeatureContainer = styled.div`
-width: 90%;
-height: 284px;
-margin: 10px;
-padding-top: 10px;
-background: rgba(242, 242, 242, 1);
+  width: 90%;
+  height: 284px;
+  margin: 10px;
+  padding-top: 10px;
+  background: rgba(242, 242, 242, 1);
 `;
 
 const StatusCheckbox = styled(Checkbox.Group)`
@@ -170,7 +172,7 @@ const statusSpan = (statusIcon: string, labelString: string): ReactNode => {
     <FullWidthSpace direction={'horizontal'} size={'small'}>
       <LegendImage
         src={statusIcon}
-        alt="Adopted"
+        alt={labelString}
         style={{
           width: '20px',
           height: '20px',
@@ -233,7 +235,7 @@ const MapLegend: React.FC<MapLegendProps> = ({
     if (isAlreadySelected) {
       // Deselect the icon
       setSelectedFeatures((prevSelectedFeatures: string[]) =>
-        prevSelectedFeatures.filter((selected) => selected !== icon)
+        prevSelectedFeatures.filter((selected) => selected !== icon),
       );
     } else {
       // Select the icon
@@ -252,113 +254,169 @@ const MapLegend: React.FC<MapLegendProps> = ({
   return (
     <Collapse collapsedSize={20} in={isVisible}>
       <MapLegendContainer isVisible={isVisible}>
-      <Grid container alignItems="center" display="flex" spacing={0}>
-    <Grid item xs style={{display: 'flex', alignItems: 'center', flex: 1}}>
-        <hr style={{borderTop: '3px solid black', width: '90%', marginLeft: '20px', marginRight: '5px'}} />
-    </Grid>
-    <Grid item style={{textAlign: 'center', paddingTop: '0px'}}>
-        <Title>FEATURE TYPE</Title>
-    </Grid>
-    <Grid item xs style={{display: 'flex', alignItems: 'center', flex: 1}}>
-        <hr style={{borderTop: '3px solid black', width: '90%', marginLeft: '5px', marginRight: '20px'}} />
-    </Grid>
-</Grid>
-      <Heading>Legend and Description</Heading>
+        <Grid container alignItems="center" display="flex" spacing={0}>
+          <Grid
+            item
+            xs
+            style={{ display: 'flex', alignItems: 'center', flex: 1 }}
+          >
+            <hr
+              style={{
+                borderTop: '3px solid black',
+                width: '90%',
+                marginLeft: '20px',
+                marginRight: '5px',
+              }}
+            />
+          </Grid>
+          <Grid item style={{ textAlign: 'center', paddingTop: '0px' }}>
+            <Title>FEATURE TYPE</Title>
+          </Grid>
+          <Grid
+            item
+            xs
+            style={{ display: 'flex', alignItems: 'center', flex: 1 }}
+          >
+            <hr
+              style={{
+                borderTop: '3px solid black',
+                width: '90%',
+                marginLeft: '5px',
+                marginRight: '20px',
+              }}
+            />
+          </Grid>
+        </Grid>
+        <Heading>Legend and Description</Heading>
 
-<FeatureContainer>
-  <LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Rain Garden')} 
-      isSelected={selectedFeatures.includes('Rain Garden')} 
-    >
-      <LegendImage src={squareSVG} alt="Square" style={{ width: '20px', height: '20px', justifyContent: 'center',}} />
-      <LegendText>
-        RAIN GARDEN
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
+        <FeatureContainer>
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Rain Garden')}
+                isSelected={selectedFeatures.includes('Rain Garden')}
+              >
+                <LegendImage
+                  src={squareSVG}
+                  alt="Square"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>RAIN GARDEN</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
 
-<LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Bioswale')} 
-      isSelected={selectedFeatures.includes('Bioswale')} 
-    >
-      <LegendImage src={triangleSVG} alt="Triangle" style={{ width: '20px', height: '20px', justifyContent: 'center' }} />
-      <LegendText>
-        BIOSWALE
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Bioswale')}
+                isSelected={selectedFeatures.includes('Bioswale')}
+              >
+                <LegendImage
+                  src={triangleSVG}
+                  alt="Triangle"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>BIOSWALE</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
 
-<LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Bioretention')} 
-      isSelected={selectedFeatures.includes('Bioretention')} 
-    >
-      <LegendImage src={circleSVG} alt="Circle" style={{ width: '20px', height: '20px', justifyContent: 'center' }} />
-      <LegendText>
-        BIORETENTION
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Bioretention')}
+                isSelected={selectedFeatures.includes('Bioretention')}
+              >
+                <LegendImage
+                  src={circleSVG}
+                  alt="Circle"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>BIORETENTION</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
 
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Porous Paving')}
+                isSelected={selectedFeatures.includes('Porous Paving')}
+              >
+                <LegendImage
+                  src={diamondSVG}
+                  alt="Diamond"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>POROUS PAVING</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
 
-<LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Porous Paving')} 
-      isSelected={selectedFeatures.includes('Porous Paving')} 
-    >
-      <LegendImage src={diamondSVG} alt="Diamond" style={{ width: '20px', height: '20px', justifyContent: 'center' }} />
-      <LegendText>
-        POROUS PAVING
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Tree Trench/Pit')}
+                isSelected={selectedFeatures.includes('Tree Trench/Pit')}
+              >
+                <LegendImage
+                  src={starSVG}
+                  alt="Star"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>TREE TRENCH/PIT</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
 
-
-<LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Tree Trench/Pit')} 
-      isSelected={selectedFeatures.includes('Tree Trench/Pit')} 
-    >
-      <LegendImage src={starSVG} alt="Star" style={{ width: '20px', height: '20px', justifyContent: 'center' }} />
-      <LegendText>
-        TREE TRENCH/PIT
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
-
-<LegendItem>
-  {icons && (
-    <StyledButton
-      onClick={() => handleFeatureClick('Green Roof/Planter')} 
-      isSelected={selectedFeatures.includes('Green Roof/Planter')} 
-    >
-      <LegendImage src={pentagonSVG} alt="Pentagon" style={{ width: '20px', height: '20px', justifyContent: 'center' }} />
-      <LegendText>
-        GREEN ROOF/PLANTER
-      </LegendText>
-    </StyledButton>
-  )}
-</LegendItem>
-</FeatureContainer>
+          <LegendItem>
+            {icons && (
+              <StyledButton
+                onClick={() => handleFeatureClick('Green Roof/Planter')}
+                isSelected={selectedFeatures.includes('Green Roof/Planter')}
+              >
+                <LegendImage
+                  src={pentagonSVG}
+                  alt="Pentagon"
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    justifyContent: 'center',
+                  }}
+                />
+                <LegendText>GREEN ROOF/PLANTER</LegendText>
+              </StyledButton>
+            )}
+          </LegendItem>
+        </FeatureContainer>
 
         <StatusContainer>
           <LegendItem>
             {icons && (
               <StatusCheckbox
-                onChange={(values: CheckboxValueType[]) =>
-                  handleStatusClick(values)
+                onChange={(values) =>
+                  handleStatusClick(values as CheckboxValueType[])
                 }
                 value={selectedStatuses}
                 options={options}
@@ -387,6 +445,5 @@ const MapLegend: React.FC<MapLegendProps> = ({
     </Collapse>
   );
 };
-
 
 export default MapLegend;

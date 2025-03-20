@@ -4,6 +4,7 @@ import { DynamoDbService } from '../dynamodb';
 import { UserInputModel, UserStatus, Role } from './user.model';
 import { NewUserInput } from '../dtos/newUserDTO';
 
+
 @Injectable()
 export class UserService {
   private readonly tableName = 'gibostonUsers';
@@ -51,6 +52,7 @@ export class UserService {
       throw new Error('Unable to post new user: ' + e);
     }
   }
+
 
   public async getUserTables(userId: number): Promise<Array<number>> {
     try {

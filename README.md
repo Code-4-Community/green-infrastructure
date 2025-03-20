@@ -13,7 +13,7 @@ To start the development server run `nx serve frontend`. Open your browser and n
 To run just the frontend (port 4200):
 
 ```
-nx serve frontend
+nx serve green-infrastructure-frontend
 ```
 
 To run just the backend (port 3000):

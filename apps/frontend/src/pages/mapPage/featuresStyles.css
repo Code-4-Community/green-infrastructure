@@ -1,0 +1,29 @@
+.bench-photo {
+  position: relative;
+  height: 480px;
+  margin-bottom: 20px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bench-photo .default-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(45, 106, 79, 0.7);
+  z-index: 1;
+}
+
+.bench-photo .features-text {
+  font-family: Montserrat;
+  position: relative;
+  color: white;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 50px;
+  padding: 30px;
+  z-index: 2;
+}
