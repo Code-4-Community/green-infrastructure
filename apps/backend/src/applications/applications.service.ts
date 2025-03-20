@@ -10,8 +10,12 @@ import { SiteService } from '../site/site.service';
 @Injectable()
 export class ApplicationsService {
   private readonly tableName = 'gibostonApplications';
-  constructor(private readonly dynamoDbService: DynamoDbService, private readonly lambdaService:LambdaService, 
-    private readonly userService: UserService, private readonly siteService: SiteService) {}
+  constructor(
+    private readonly dynamoDbService: DynamoDbService,
+    private readonly lambdaService: LambdaService,
+    private readonly userService: UserService,
+    private readonly siteService: SiteService,
+  ) {}
 
   /**
    * Gets all applications.
@@ -34,9 +38,13 @@ export class ApplicationsService {
    */
   public async getFirstApplications(): Promise<ApplicationsModel[]> {
     try {
-      const data = await this.dynamoDbService.scanTable(this.tableName, 'isFirstApplication = :isFirst', {
-        ':isFirst': { BOOL: true },
-      });
+      const data = await this.dynamoDbService.scanTable(
+        this.tableName,
+        'isFirstApplication = :isFirst',
+        {
+          ':isFirst': { BOOL: true },
+        },
+      );
       return data.map(this.mapDynamoDBItemToApplication);
     } catch (e) {
       throw new Error('Unable to retrieve first applications: ' + e);
@@ -54,7 +62,7 @@ export class ApplicationsService {
     appStatus: ApplicationStatus,
   ): Promise<ApplicationsModel> {
     try {
-      const key = { 'appId': { N: appId } };
+      const key = { appId: { N: appId } };
       const application = await this.dynamoDbService.getItem(
         this.tableName,
         key,
@@ -67,61 +75,92 @@ export class ApplicationsService {
         key,
         appStatus,
       );
+      if (appStatus === ApplicationStatus.APPROVED) {
+        const user = await this.userService.getUser(application.userId.N);
+        const site = await this.siteService.getSite(application.siteId.N);
+        const name = user.firstName;
+        const email = user.email;
+        const userId = user.userId;
+
+        const siteName = site.siteName;
+        const timeFrame = '30 days';
+        const emailData = {
+          firstName: name,
+          userEmail: email,
+          siteName: siteName,
+          timeFrame: timeFrame,
+          userId: userId,
+        };
+        const lambdaResult = await this.lambdaService.invokeLambda(
+          'giSendApplicationApproved',
+          emailData,
+        );
+        console.log('Lambda result: ', lambdaResult);
+      }
       return this.mapDynamoDBItemToApplication(updatedApplication);
     } catch (e) {
       throw new Error('Unable to update application status: ' + e);
     }
   }
- 
+
   public async postApplication(applicationData: NewApplicationInput) {
-    const newId = await this.dynamoDbService.getHighestAppId(this.tableName) + 1;
-    const applicationModel = this.PostInputToApplicationModel(applicationData, newId.toString());
-    console.log("Received application data:", applicationData);
+    const newId =
+      (await this.dynamoDbService.getHighestAppId(this.tableName)) + 1;
+    const applicationModel = this.PostInputToApplicationModel(
+      applicationData,
+      newId.toString(),
+    );
+    console.log('Received application data:', applicationData);
     try {
-        const result = await this.dynamoDbService.postItem(this.tableName, applicationModel);
+      const result = await this.dynamoDbService.postItem(
+        this.tableName,
+        applicationModel,
+      );
 
-        if (result.$metadata.httpStatusCode !== 200) {
-            throw new Error('Error posting application');
-        }
-        const user = await this.userService.getUser(applicationData.userId);
-        const site = await this.siteService.getSite(applicationData.siteId);
-        const name = user.firstName;
-        const email = user.email;
- 
-        const siteName = site.siteName;
-        const timeFrame = "30 days"
-        const emailData = {"firstName":name, "userEmail":email, "siteName":siteName, "timeFrame":timeFrame};
+      if (result.$metadata.httpStatusCode !== 200) {
+        throw new Error('Error posting application');
+      }
+      const user = await this.userService.getUser(applicationData.userId);
+      const site = await this.siteService.getSite(applicationData.siteId);
+      const name = user.firstName;
+      const email = user.email;
 
+      const siteName = site.siteName;
+      const timeFrame = '30 days';
+      const emailData = {
+        firstName: name,
+        userEmail: email,
+        siteName: siteName,
+        timeFrame: timeFrame,
+        userId: applicationData.userId,
+      };
 
+      const lambdaResult = await this.lambdaService.invokeLambda(
+        'giSendApplicationConfirmation',
+        emailData,
+      );
+      console.log('Lambda result: ', lambdaResult);
 
-        const lambdaResult = await this.lambdaService.invokeLambda('giSendApplicationConfirmation', emailData );
-        console.log("Lambda result: ", lambdaResult);
-
-
-        
-        return {...result, newApplicationId: newId.toString()};
+      return { ...result, newApplicationId: newId.toString() };
     } catch (e) {
-        throw new Error("Unable to post new application: " + e);
+      throw new Error('Unable to post new application: ' + e);
     }
-}
+  }
 
-
-private PostInputToApplicationModel = (input: NewApplicationInput, appId: string): ApplicationInputModel => {
-
-  return {
-    appId: { N: appId },
-    userId: { N: input.userId.toString() }, 
-    siteId: { N: input.siteId.toString() }, 
-    names: { SS: input.names },
-    status: { S: input.status as ApplicationStatus}, 
-    dateApplied: { S: input.dateApplied}, 
-    isFirstApplication: { S: input.isFirstApplication.toString() }, 
+  private PostInputToApplicationModel = (
+    input: NewApplicationInput,
+    appId: string,
+  ): ApplicationInputModel => {
+    return {
+      appId: { N: appId },
+      userId: { N: input.userId.toString() },
+      siteId: { N: input.siteId.toString() },
+      names: { SS: input.names },
+      status: { S: input.status as ApplicationStatus },
+      dateApplied: { S: input.dateApplied },
+      isFirstApplication: { S: input.isFirstApplication.toString() },
+    };
   };
-};
-
-
-
-
 
   private mapDynamoDBItemToApplication = (item: {
     [key: string]: any;
@@ -137,5 +176,3 @@ private PostInputToApplicationModel = (input: NewApplicationInput, appId: string
     };
   };
 }
-
-
