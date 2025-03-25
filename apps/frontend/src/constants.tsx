@@ -4,7 +4,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 // import { allSvgMarkers } from './components/mapIcon/MapIconDesigns';
 import availableIcon from './assets/images/siteIcons/availableIcon.jpg';
 import adoptedIcon from './assets/images/siteIcons/adoptedIcon.png';
-import invalidIcon from './assets/images/siteIcons/invalidicon.png';
+import inactiveIcon from './assets/images/siteIcons/inactiveIcon.png';
 
 export const loader = new Loader({
   apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -20,7 +20,7 @@ export const BOSTON_BOUNDS = {
   east: -70.83,
 };
 
-export type SiteStatus = 'Available' | 'Adopted' | 'Invalid';
+export type SiteStatus = 'Available' | 'Adopted' | 'Inactive';
 
 interface SiteStatusOption {
   image: string;
@@ -40,9 +40,9 @@ export const SITE_STATUS_ROADMAP: SiteStatusOption[] = [
     value: 'Adopted',
   },
   {
-    image: invalidIcon,
-    label: 'Invalid Sites',
-    value: 'Invalid',
+    image: inactiveIcon,
+    label: 'Inactive Sites',
+    value: 'Inactive',
   },
 ];
 
