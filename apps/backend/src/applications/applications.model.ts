@@ -20,8 +20,8 @@ export type ApplicationInputModel = {
   siteId: { N: string },
   names: { SS: string[] },  // For an array of strings, use SS (String Set) in DynamoDB
   status: { S: string },
-  dateApplied: { S: string },  // Date should be formatted as a string, typically ISO string
-  isFirstApplication: { S: string },
+  dateApplied: { S: string },  // Date should be formatted as a string
+  isFirstApplication: { BOOL: boolean }, // Change to BOOL type to match actual usage
 };
 
 export enum ApplicationStatus {
