@@ -93,6 +93,8 @@ const Map: React.FC<MapProps> = ({
   const [showSignUp, setShowSignUp] = useState(false);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
 
+  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
+
   let map: google.maps.Map;
 
   useEffect(() => {
@@ -187,6 +189,8 @@ const Map: React.FC<MapProps> = ({
               }
               infoWindow.open(map, marker);
               currentInfoWindow = infoWindow;
+
+              setSelectedSiteId(markerInfo.siteID);
             });
 
             markersArray.push(marker);
@@ -208,7 +212,7 @@ const Map: React.FC<MapProps> = ({
         ref={mapRef}
         style={{ width: '100%', height: '675px' }}
       />
-      {showSignUp && <SignUpPage setShowSignUp={setShowSignUp} />}
+      {showSignUp && <SignUpPage setShowSignUp={setShowSignUp} siteID={selectedSiteId} />}
     </div>
   );
 };

@@ -167,7 +167,7 @@ function PersonalInfo({ onSubmit, setIsFormValid }: PersonalInfoProps) {
       validationSchema={validationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      onSubmit={onSubmit}
+      onSubmit={(values) => onSubmit(values)}
     >
       {({
         values,
@@ -457,8 +457,10 @@ function TermsAndConditions({
 
 export default function SignUpPage({
   setShowSignUp,
+  siteID,
 }: {
   setShowSignUp: (show: boolean) => void;
+  siteID: string | null;
 }) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isChecked, setIsChecked] = useState(
@@ -467,9 +469,19 @@ export default function SignUpPage({
   const [isFormValid, setIsFormValid] = useState(false); // Track form validity
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [formValues, setFormValues] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    birthyear: "",
+    groupRepresentative: false,
+    groupMembers: "",
+  })
 
-  const handleNext = () => {
+  const handleNext = (values: any) => {
     if (step < 2) setStep(step + 1);
+    setFormValues(values);
   };
 
   const handleBack = () => {
@@ -480,10 +492,65 @@ export default function SignUpPage({
     setShowSignUp(false);
   };
 
-  const handleSubmit = () => {
-    if (isChecked.every(Boolean)) {
+  const handleSubmit = async () => {
+    if (isChecked.every(Boolean) && isFormValid) {
       setIsSubmitted(true);
-      navigate('/success');
+      const userRequestBody = {
+        firstName: formValues["firstname"],
+        lastName: formValues["lastname"],
+        phoneNumber: formValues["phone"],
+        email: formValues["email"],
+        zipCode: "123",
+        birthDate: formValues["birthyear"],
+      };
+
+      try {
+        const userResponse = await fetch('http://localhost:3000/users/addVolunteer', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userRequestBody),
+        }); 
+  
+        const userData = await userResponse.json();
+        const userID = userData["newUserID"];
+    
+        console.log("User created:", userData);
+
+        const now = new Date().toISOString();
+        const names = [`${formValues["firstname"]} ${formValues["lastname"]}`]
+        if (formValues["groupRepresentative"]) {
+          const groupMembers = formValues["groupMembers"].split(",")
+          names.push(...groupMembers)
+        }
+
+        const applicationRequestBody = {
+          userId: userID,
+          siteId: siteID,
+          names: names,
+          status: "Pending",
+          dateApplied: now,
+          isFirstApplication: true,
+        };
+        
+        const applicationResponse = await fetch('http://localhost:3000/applications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(applicationRequestBody),
+        });
+
+        const applicationData = await applicationResponse.json();
+        console.log("Application submitted:", applicationData);
+
+      } catch (error) {
+        console.error("Error:", error);
+      }
+
+      //navigate('/success');
+
     }
   };
 
