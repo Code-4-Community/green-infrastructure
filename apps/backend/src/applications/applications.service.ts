@@ -135,29 +135,34 @@ export class ApplicationsService {
               zipCode: applicationData.zipCode,
               birthDate: applicationData.birthDate,
             },
-            Role.VOLUNTEER
+            Role.VOLUNTEER,
           );
 
           // Extract the new user ID from the result - fix the way we access newUserID
           userId = parseInt(newUserResult.newUserID);
-          console.log("Created new user with ID:", userId);
+          console.log('Created new user with ID:', userId);
         } catch (error) {
           throw new BadRequestException(
-            `Failed to create new user: ${error.message}`
+            `Failed to create new user: ${error.message}`,
           );
         }
+      } else {
+        throw new BadRequestException(
+          'Not expecting userId for first-time applications.',
+        );
       }
     } else if (!userId) {
       // For non-first-time applications, userId is required
       throw new BadRequestException(
-        'User ID is required for non-first-time applications'
+        'User ID is required for non-first-time applications',
       );
     }
 
     // Ensure we have names array to avoid undefined issues
     const names = applicationData.names || [];
 
-    const newId = (await this.dynamoDbService.getHighestAppId(this.tableName)) + 1;
+    const newId =
+      (await this.dynamoDbService.getHighestAppId(this.tableName)) + 1;
 
     try {
       // Create application with proper types
@@ -165,15 +170,17 @@ export class ApplicationsService {
         appId: { N: newId.toString() },
         userId: { N: userId.toString() },
         siteId: { N: applicationData.siteId.toString() },
-        names: { SS: names.length > 0 ? names : [""] },  // Ensure non-empty array with at least one element
+        names: { SS: names.length > 0 ? names : [''] }, // Ensure non-empty array with at least one element
         status: { S: applicationData.status || ApplicationStatus.PENDING },
-        dateApplied: { S: applicationData.dateApplied || new Date().toISOString() },
+        dateApplied: {
+          S: applicationData.dateApplied || new Date().toISOString(),
+        },
         isFirstApplication: { BOOL: applicationData.isFirstApplication }, // Use BOOL type directly
       };
 
       const result = await this.dynamoDbService.postItem(
         this.tableName,
-        applicationModel
+        applicationModel,
       );
 
       const user = await this.userService.getUser(userId);
@@ -199,7 +206,7 @@ export class ApplicationsService {
 
       return { ...result, newApplicationId: newId.toString() };
     } catch (e) {
-      console.error("Error posting application:", e);
+      console.error('Error posting application:', e);
       throw new Error('Unable to post new application: ' + e);
     }
   }
@@ -213,7 +220,7 @@ export class ApplicationsService {
       appId: { N: appId },
       userId: { N: input.userId.toString() },
       siteId: { N: input.siteId.toString() },
-      names: { SS: input.names && input.names.length > 0 ? input.names : [""] }, // Ensure non-empty
+      names: { SS: input.names && input.names.length > 0 ? input.names : [''] }, // Ensure non-empty
       status: { S: input.status as ApplicationStatus },
       dateApplied: { S: input.dateApplied },
       isFirstApplication: { BOOL: input.isFirstApplication }, // Change to BOOL type
