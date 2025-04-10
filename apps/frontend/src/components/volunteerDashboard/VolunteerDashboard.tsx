@@ -96,12 +96,9 @@ function VolunteerDashboard({
               }}
             >
               <Box sx={{ ...boxStyles, height: '100%', width: '100%' }}>
-                {userData ? (
-                  <ul>
-                    {userData.siteIds.map((siteId) => (
-                      <li>{siteId}</li>
-                    ))}
-                  </ul>
+                {userData && userData.siteIds.length > 0 ? (
+                  //hard coded to be the first site id
+                  <p>My Site: {userData.siteIds[0]}</p>
                 ) : (
                   <p>My Adopted Green Infrastructure</p>
                 )}

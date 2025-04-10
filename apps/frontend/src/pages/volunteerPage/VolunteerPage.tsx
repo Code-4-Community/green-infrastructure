@@ -35,7 +35,7 @@ export default function VolunteerPage() {
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [maintenanceChecklistOpen, setMaintenanceChecklistOpen] =
     useState(false);
-  const tempUserID = '1';
+  const tempUserID = '400';
   const [volunteerInfo, setVolunteerInfo] = useState<UserModel | null>(null);
 
   const fetchUserInfo = async () => {
