@@ -16,4 +16,5 @@ export class SignInResponseDto {
      * @example eyJ...
      */
     idToken: string;
+    userId: string;
 }

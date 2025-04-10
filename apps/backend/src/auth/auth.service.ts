@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   AdminInitiateAuthCommand,
+  AdminGetUserCommand,
   AttributeType,
   CognitoIdentityProviderClient,
   ListUsersCommand,
@@ -78,10 +79,22 @@ export class AuthService {
 
     const response = await this.providerClient.send(signInCommand);
 
+    const getUserCommand = new AdminGetUserCommand({
+      UserPoolId: CognitoAuthConfig.userPoolId,
+      Username: email,
+    });
+    const userResponse = await this.providerClient.send(getUserCommand);
+
+    // Find userId in the user's custom attributes
+    const userId = userResponse.UserAttributes?.find(
+      (attr) => attr.Name === 'custom:userId'
+    )?.Value;
+
     return {
       accessToken: response.AuthenticationResult.AccessToken,
       refreshToken: response.AuthenticationResult.RefreshToken,
       idToken: response.AuthenticationResult.IdToken,
+      userId
     };
   }
 

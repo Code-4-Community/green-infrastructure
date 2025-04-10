@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useAuth } from '../../context/AuthContext';
 import { Button, Box, Image, Input, Text, Stack } from "@chakra-ui/react";
 import { Link, useNavigate } from "react-router-dom";
 import BostonImage from "../../assets/images/loginPageMedia/boston-pru.png"
@@ -8,6 +9,7 @@ import cityOfBostonLogo from '../../images/logos/cityOfBostonLogo.png';
 
 
 export default function LoginPage() {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
@@ -20,10 +22,8 @@ export default function LoginPage() {
         password,
       });
 
-      // Store tokens in localStorage or context
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('idToken', response.data.idToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      // Store tokens in AuthContext
+      login(response.data.userId, response.data.accessToken)
 
       alert('Sign in successful!');
       navigate('/volunteer');
