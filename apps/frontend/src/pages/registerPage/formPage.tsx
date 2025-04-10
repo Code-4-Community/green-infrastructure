@@ -13,15 +13,13 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import {UserModel, NewUserInput } from '../../types/UserModel';
 import {SignUpDto} from '../../types/SignUpModel';
+import axios from 'axios';
 
 interface FormPageProps {
   setIsSubmitted: (value: boolean) => void;
 }
 
 
-
-
-const api = 'http://localhost:3000/';
 
 const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -45,34 +43,38 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
     e.preventDefault();
   
     try {
-      const matchingUser = await fetch(api + "users/" + userId);
-      if (!matchingUser.ok) {
-        throw new Error(matchingUser.statusText);
-      }
-      const user: UserModel = await matchingUser.json();
-  
+      const matchingResponse = await axios.get<UserModel>(`${process.env.VITE_API_BASE_URL}/users/${userId}`);
+      const user: UserModel = matchingResponse.data;
+      // continue using `user` here
+    
       if (user.email !== email) {
         alert('User ID and email do not match. Please try again.');
         return;
       }
+
+      if (password !== rePassword) {
+        alert('Passwords do not match. Please try again.');
+        return;
+      }
   
       const inputUser: SignUpDto = { email, password };
-  
-      const response = await fetch(api + 'auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(inputUser),
-      });
-  
-      if (response.ok) {
-        alert('Account created successfully!');
-        setIsSubmitted(true);
-      } else {
-        alert('There was an error. Please try again.');
+
+      try {
+        const response = await axios.post<NewUserInput>(`${process.env.VITE_API_BASE_URL}/auth/signup`, inputUser);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          console.error('Error fetching user:', error.response?.status, error.message);
+        } else {
+          console.error('Unexpected error:', error);
+        }
       }
+
     } catch (error) {
-      console.error("Error during form submission:", error);
-      alert("An error occurred. Please check your inputs and try again.");
+      if (axios.isAxiosError(error)) {
+        console.error('Error fetching user:', error.response?.status, error.message);
+      } else {
+        console.error('Unexpected error:', error);
+      }
     }
   };
 
