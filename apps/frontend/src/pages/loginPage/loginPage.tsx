@@ -5,6 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import BostonImage from "../../assets/images/loginPageMedia/boston-pru.png"
 import c4cLogo from '../../images/logos/c4cLogo.png';
 import cityOfBostonLogo from '../../images/logos/cityOfBostonLogo.png';
+import { useAuth } from '../../AuthContext';
+
+
 
 
 export default function LoginPage() {
@@ -26,6 +29,8 @@ export default function LoginPage() {
       localStorage.setItem('refreshToken', response.data.refreshToken);
 
       alert('Sign in successful!');
+      const { login } = useAuth();
+      login(response.data.accessToken);
       navigate('/volunteer');
     } catch (err) {
       alert('Invalid username or password');
