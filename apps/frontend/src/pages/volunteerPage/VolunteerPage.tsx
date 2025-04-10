@@ -3,16 +3,59 @@ import VolunteerDashboard from '../../components/volunteerDashboard/VolunteerDas
 import MaintenanceChecklistPopup from '../../components/volunteerDashboard/MaintenanceChecklistPopup';
 import Map from '../../components/map/Map';
 import MapLegend from '../../components/map/MapLegend';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SITE_STATUS_ROADMAP } from '../../constants';
 
 const icons: string[] = SITE_STATUS_ROADMAP.map((option) => option.image);
+export enum Role {
+  VOLUNTEER = 'Volunteer',
+  ADMIN = 'Admin',
+}
+
+export enum UserStatus {
+  APPROVED = 'Approved',
+  PENDING = 'Pending',
+  DENIED = 'Denied',
+}
+export interface UserModel {
+  userId: number;
+  firstName: string;
+  lastName: string;
+  phoneNumber: number;
+  email: string;
+  siteIds: number[];
+  zipCode: number;
+  birthDate: Date;
+  role: Role;
+  status: UserStatus;
+}
 
 export default function VolunteerPage() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [maintenanceChecklistOpen, setMaintenanceChecklistOpen] =
     useState(false);
+  const tempUserID = '1';
+  const [volunteerInfo, setVolunteerInfo] = useState<UserModel | null>(null);
+
+  const fetchUserInfo = async () => {
+    // Simulate an API call to fetch user information
+    const response = await fetch('http://localhost:3000/users/' + tempUserID);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user information');
+    }
+    const userData: UserModel = await response.json();
+    console.log(userData);
+    return userData;
+  };
+  useEffect(() => {
+    async function fetchData() {
+      console.log('test test testDENNIS');
+      const volunteerInfo = await fetchUserInfo();
+      setVolunteerInfo(volunteerInfo);
+    }
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -20,6 +63,7 @@ export default function VolunteerPage() {
       <div style={{ marginTop: '50px' }} />
       <VolunteerDashboard
         setMaintenanceChecklistOpen={setMaintenanceChecklistOpen}
+        userData={volunteerInfo}
       />
       <MaintenanceChecklistPopup
         maintenanceChecklistOpen={maintenanceChecklistOpen}
