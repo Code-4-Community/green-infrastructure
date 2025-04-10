@@ -5,7 +5,7 @@ const useAxios = () => {
   const { token, logout } = useAuth();
 
   const axiosInstance = axios.create({
-    baseURL: 'https://localhost:3000',
+    baseURL: 'http://localhost:3000',
   });
 
   axiosInstance.interceptors.request.use(
