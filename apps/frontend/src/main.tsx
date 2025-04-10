@@ -8,7 +8,8 @@ import MapPage from './pages/mapPage/MapPage';
 import SuccessPage from './components/volunteer/signup/SuccessPage';
 import VolunteerPage from './pages/volunteerPage/VolunteerPage';
 import MyAdoptedGIPage from './pages/myAdoptedGIPage/MyAdoptedGIPage';
-
+import AdminPage from './pages/adminpage/AdminPage';
+import ApplicationsPage from './pages/applicationsPage/applicationsPage';
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <Route path="/" element={<MapPage />} />
           <Route path="/success" element={<SuccessPage />} />
           <Route path="/volunteer" element={<VolunteerPage />} />
-          <Route path="/volunteer/my-adopted-gi" element={<MyAdoptedGIPage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="/volunteer/my-adopted-gi"
+            element={<MyAdoptedGIPage />}
+          />
+          <Route path="/admin/applications" element={<ApplicationsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>

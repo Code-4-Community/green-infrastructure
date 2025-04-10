@@ -3,11 +3,14 @@ import { UserModel, EditUserModel } from './user.model';
 import { DynamoDbService } from '../dynamodb';
 import { UserInputModel, UserStatus, Role } from './user.model';
 import { NewUserInput } from '../dtos/newUserDTO';
-
+import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 @Injectable()
 export class UserService {
   private readonly tableName = 'gibostonUsers';
+  private readonly lambdaClient: LambdaClient = new LambdaClient({
+    region: process.env.AWS_REGION,
+  });
   constructor(private readonly dynamoDbService: DynamoDbService) {}
 
   /**
@@ -52,7 +55,6 @@ export class UserService {
       throw new Error('Unable to post new user: ' + e);
     }
   }
-
 
   public async getUserTables(userId: number): Promise<Array<number>> {
     try {
@@ -125,7 +127,21 @@ export class UserService {
       if (model.status) {
         commands.push(`#s = :status`);
         expressionAttributeValues[':status'] = { S: model.status };
-        expressionAttributeNames['#s'] = 'status'; // Define the alias
+        expressionAttributeNames['#s'] = 'status';
+        if (model.status === UserStatus.DENIED) {
+          // Send email if status is denied
+          const lamdaParams = {
+            FunctionName: 'giSendEmail',
+            Payload: JSON.stringify({
+              firstName: model.firstName
+                ? model.firstName
+                : originalUser.firstName,
+              userEmail: originalUser.email,
+            }),
+          };
+          const command = new InvokeCommand(lamdaParams);
+          await this.lambdaClient.send(command);
+        }
       }
 
       // Make sure commands aren't empty
@@ -178,6 +194,26 @@ export class UserService {
     }
   }
 
+  public async getUserByRole(role: Role): Promise<UserModel[]> {
+    try {
+      const filterExpression = '#user_role = :roleOf';
+      const expressionAttributeValues = { ':roleOf': { S: role } };
+      const expressionAttributeNames = { '#user_role': 'role' };
+
+      const data = await this.dynamoDbService.scanTable(
+        this.tableName,
+        filterExpression,
+        expressionAttributeValues,
+        expressionAttributeNames,
+      );
+
+      return data.map((item) => this.mapDynamoDBItemToUserModelV2(item)); // added data
+    } catch (error) {
+      console.error('Error fetching users by role:', error);
+      throw new Error(`Error fetching users by role: ${error.message}`);
+    }
+  }
+
   /**
    * Maps a user's data from DynamoDB to a UserModel object.
    * @param objectId the user's id
@@ -189,21 +225,26 @@ export class UserService {
     objectId: number,
     data?: { [key: string]: any },
   ): UserModel {
-    const siteIds = Array.isArray(data['siteIds']?.L)
-      ? data['siteIds'].L.map((item) => Number(item.N))
-      : [];
+    const getString = (key: string) => data?.[key]?.S ?? '-';
+    const getNumber = (key: string) => Number(data?.[key]?.N ?? 0);
+
+    const rawSiteIds = data?.['siteIds'];
+    const siteIds =
+      rawSiteIds && 'L' in rawSiteIds
+        ? rawSiteIds.L.map((item) => Number(item.N))
+        : [];
 
     return {
       userId: objectId,
-      firstName: data['firstName'].S,
-      lastName: data['lastName'].S,
-      email: data['email'].S,
-      phoneNumber: data['phoneNumber'].N,
-      siteIds: siteIds,
-      zipCode: data['zipCode'].S,
-      birthDate: new Date(data['birthDate'].S),
-      role: data['role'].S,
-      status: data['status'].S,
+      firstName: getString('firstName'),
+      lastName: getString('lastName'),
+      email: getString('email'),
+      phoneNumber: getNumber('phoneNumber'),
+      siteIds,
+      zipCode: getString('zipCode'),
+      birthDate: new Date(getString('birthDate')),
+      role: getString('role') as Role,
+      status: getString('status') as UserStatus,
     };
   }
 
