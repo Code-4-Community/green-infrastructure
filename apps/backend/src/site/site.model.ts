@@ -30,7 +30,7 @@ export type SiteInputModel = {
 export enum SiteStatus {
     ADOPTED = "Adopted",
     AVAILABLE = "Available",
-    INVALID = "Invalid",
+    INACTIVE = "Inactive",
 };
 
 export enum SymbolType {
