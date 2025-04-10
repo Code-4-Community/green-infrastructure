@@ -8,12 +8,14 @@ import MapPage from './pages/mapPage/MapPage';
 import SuccessPage from './components/volunteer/signup/SuccessPage';
 import VolunteerPage from './pages/volunteerPage/VolunteerPage';
 import MyAdoptedGIPage from './pages/myAdoptedGIPage/MyAdoptedGIPage';
+import { AuthProvider } from './AuthContext';
 
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
+    <AuthProvider>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
@@ -26,5 +28,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>
+    </AuthProvider>
   </React.StrictMode>,
+
 );
