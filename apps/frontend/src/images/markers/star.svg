@@ -1,4 +1,3 @@
 <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="11" cy="11" r="9.75" fill="#FFFDFD" stroke="black" stroke-width="1.5"/>
-<path d="M11 6L12.1226 9.45492H15.7553L12.8164 11.5902L13.9389 15.0451L11 12.9098L8.06107 15.0451L9.18364 11.5902L6.24472 9.45492H9.87743L11 6Z" fill="#091F2F"/>
+  <path d="M11 4L12.5 9H18L13.5 12.5L15 18L11 14.5L7 18L8.5 12.5L4 9H9.5L11 4Z" fill="#091F2F"/>
 </svg>
