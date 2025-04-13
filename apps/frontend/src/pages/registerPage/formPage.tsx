@@ -43,7 +43,7 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
     e.preventDefault();
   
     try {
-      const matchingResponse = await axios.get<UserModel>(`${process.env.VITE_API_BASE_URL}/users/${userId}`);
+      const matchingResponse = await axios.get<UserModel>(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`);
       const user: UserModel = matchingResponse.data;
       // continue using `user` here
     
@@ -60,7 +60,8 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
       const inputUser: SignUpDto = { email, password };
 
       try {
-        const response = await axios.post<NewUserInput>(`${process.env.VITE_API_BASE_URL}/auth/signup`, inputUser);
+        const response = await axios.post<NewUserInput>(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, inputUser);
+        setIsSubmitted(true);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error('Error fetching user:', error.response?.status, error.message);
