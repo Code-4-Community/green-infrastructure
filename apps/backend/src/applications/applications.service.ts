@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { ApplicationInputModel, ApplicationsModel } from './applications.model';
 import { DynamoDbService } from '../dynamodb';
 import { ApplicationStatus } from './applications.model';
@@ -6,6 +6,7 @@ import { NewApplicationInput } from '../dtos/newApplicationsDTO';
 import { LambdaService } from '../lambda';
 import { UserService } from '../user/user.service';
 import { SiteService } from '../site/site.service';
+import { Role } from '../user/user.model';
 
 @Injectable()
 export class ApplicationsService {
@@ -104,23 +105,85 @@ export class ApplicationsService {
   }
 
   public async postApplication(applicationData: NewApplicationInput) {
+    let userId = applicationData.userId;
+
+    // Handle first-time applications - create new user
+    if (applicationData.isFirstApplication === true) {
+      if (!userId) {
+        // Validate required fields for user creation
+        if (
+          !applicationData.firstName ||
+          !applicationData.lastName ||
+          !applicationData.email ||
+          !applicationData.phoneNumber ||
+          !applicationData.zipCode ||
+          !applicationData.birthDate
+        ) {
+          throw new BadRequestException(
+            'First name, last name, email, phone number, zip code, and birth date are required for first-time applications',
+          );
+        }
+
+        // Create a new user using postUser method
+        try {
+          const newUserResult = await this.userService.postUser(
+            {
+              firstName: applicationData.firstName,
+              lastName: applicationData.lastName,
+              email: applicationData.email,
+              phoneNumber: applicationData.phoneNumber,
+              zipCode: applicationData.zipCode,
+              birthDate: applicationData.birthDate,
+            },
+            Role.VOLUNTEER,
+          );
+
+          // Extract the new user ID from the result - fix the way we access newUserID
+          userId = parseInt(newUserResult.newUserID);
+          console.log('Created new user with ID:', userId);
+        } catch (error) {
+          throw new BadRequestException(
+            `Failed to create new user: ${error.message}`,
+          );
+        }
+      } else {
+        throw new BadRequestException(
+          'Not expecting userId for first-time applications.',
+        );
+      }
+    } else if (!userId) {
+      // For non-first-time applications, userId is required
+      throw new BadRequestException(
+        'User ID is required for non-first-time applications',
+      );
+    }
+
+    // Ensure we have names array to avoid undefined issues
+    const names = applicationData.names || [];
+
     const newId =
       (await this.dynamoDbService.getHighestAppId(this.tableName)) + 1;
-    const applicationModel = this.PostInputToApplicationModel(
-      applicationData,
-      newId.toString(),
-    );
-    console.log('Received application data:', applicationData);
+
     try {
+      // Create application with proper types
+      const applicationModel = {
+        appId: { N: newId.toString() },
+        userId: { N: userId.toString() },
+        siteId: { N: applicationData.siteId.toString() },
+        names: { SS: names.length > 0 ? names : [''] }, // Ensure non-empty array with at least one element
+        status: { S: applicationData.status || ApplicationStatus.PENDING },
+        dateApplied: {
+          S: applicationData.dateApplied || new Date().toISOString(),
+        },
+        isFirstApplication: { BOOL: applicationData.isFirstApplication }, // Use BOOL type directly
+      };
+
       const result = await this.dynamoDbService.postItem(
         this.tableName,
         applicationModel,
       );
 
-      if (result.$metadata.httpStatusCode !== 200) {
-        throw new Error('Error posting application');
-      }
-      const user = await this.userService.getUser(applicationData.userId);
+      const user = await this.userService.getUser(userId);
       const site = await this.siteService.getSite(applicationData.siteId);
       const name = user.firstName;
       const email = user.email;
@@ -132,7 +195,7 @@ export class ApplicationsService {
         userEmail: email,
         siteName: siteName,
         timeFrame: timeFrame,
-        userId: applicationData.userId,
+        userId: userId,
       };
 
       const lambdaResult = await this.lambdaService.invokeLambda(
@@ -143,10 +206,12 @@ export class ApplicationsService {
 
       return { ...result, newApplicationId: newId.toString() };
     } catch (e) {
+      console.error('Error posting application:', e);
       throw new Error('Unable to post new application: ' + e);
     }
   }
 
+  // Fix PostInputToApplicationModel method to handle the BOOL type correctly
   private PostInputToApplicationModel = (
     input: NewApplicationInput,
     appId: string,
@@ -155,10 +220,10 @@ export class ApplicationsService {
       appId: { N: appId },
       userId: { N: input.userId.toString() },
       siteId: { N: input.siteId.toString() },
-      names: { SS: input.names },
+      names: { SS: input.names && input.names.length > 0 ? input.names : [''] }, // Ensure non-empty
       status: { S: input.status as ApplicationStatus },
       dateApplied: { S: input.dateApplied },
-      isFirstApplication: { S: input.isFirstApplication.toString() },
+      isFirstApplication: { BOOL: input.isFirstApplication }, // Change to BOOL type
     };
   };
 
