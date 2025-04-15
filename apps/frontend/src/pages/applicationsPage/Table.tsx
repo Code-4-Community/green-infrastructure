@@ -170,7 +170,7 @@ export default function ApplicantsTable({
     setSelectedApplicant(null);
   };
 
-  const handleApprove = async (applicantId: string) => {
+  const handleApprove = async (applicantId: string, siteId: string) => {
     try {
       await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/applications/editApplication/${applicantId}`,
@@ -180,7 +180,11 @@ export default function ApplicantsTable({
         }
       );
 
-      console.log()
+      console.log(siteId)
+
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/sites/adopt/${siteId}`
+      );
       
       // Update local state
       const updatedApplicants = filteredApplicants.map(app => 

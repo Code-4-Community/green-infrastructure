@@ -7,7 +7,7 @@ interface ApplicantCardProps {
   applicant: any;
   user: any;
   site: any;
-  onApprove: (applicantId: string) => void;
+  onApprove: (applicantId: string, siteId: string) => void;
   onDeny: (applicantId: string) => void;
   onBack: () => void;
   onSkip: () => void;
@@ -222,7 +222,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
             <Button
               variant="contained"
               style={{ ...actionButtonStyle, backgroundColor: '#3174D5', color: 'white' }}
-              onClick={() => onApprove(applicant.appId)}
+              onClick={() => onApprove(applicant.appId, applicant.siteId)}
             >
               Approve
             </Button>
