@@ -3,14 +3,10 @@ import { UserModel, EditUserModel } from './user.model';
 import { DynamoDbService } from '../dynamodb';
 import { UserInputModel, UserStatus, Role } from './user.model';
 import { NewUserInput } from '../dtos/newUserDTO';
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
 @Injectable()
 export class UserService {
   private readonly tableName = 'gibostonUsers';
-  private readonly lambdaClient: LambdaClient = new LambdaClient({
-    region: process.env.AWS_REGION,
-  });
   constructor(private readonly dynamoDbService: DynamoDbService) {}
 
   /**
@@ -127,21 +123,7 @@ export class UserService {
       if (model.status) {
         commands.push(`#s = :status`);
         expressionAttributeValues[':status'] = { S: model.status };
-        expressionAttributeNames['#s'] = 'status';
-        if (model.status === UserStatus.DENIED) {
-          // Send email if status is denied
-          const lamdaParams = {
-            FunctionName: 'giSendEmail',
-            Payload: JSON.stringify({
-              firstName: model.firstName
-                ? model.firstName
-                : originalUser.firstName,
-              userEmail: originalUser.email,
-            }),
-          };
-          const command = new InvokeCommand(lamdaParams);
-          await this.lambdaClient.send(command);
-        }
+        expressionAttributeNames['#s'] = 'status'; // Define the alias
       }
 
       // Make sure commands aren't empty

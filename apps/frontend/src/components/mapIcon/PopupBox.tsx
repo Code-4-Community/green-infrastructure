@@ -44,6 +44,7 @@ export default function PopupBox({
   svgFunction,
 }: Props) {
   const openSignUp = () => {
+    // Triggers the sign-up form to open (the siteId was already set on marker click)
     setShowSignUp(true);
   };
 
@@ -73,75 +74,45 @@ export default function PopupBox({
         >
           {type}
         </text>
-        <div
-          style={{ marginTop: '9%' }}
-          dangerouslySetInnerHTML={{ __html: svgFunction('#ffffff') }}
-        />
+        <div style={{ marginTop: '9%' }} dangerouslySetInnerHTML={{ __html: svgFunction('#ffffff') }} />
       </div>
 
       <div style={popupStyles.details}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginTop: '5%',
-            gap: '5px',
-          }}
-        >
-          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>
-            NAME:
-          </text>
-          <text style={{ fontFamily: 'system-ui', whiteSpace: 'nowrap' }}>
-            {name}
-          </text>
+        <div style={{ display: 'flex', flexDirection: 'row', marginTop: '5%', gap: '5px' }}>
+          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>NAME:</text>
+          <text style={{ fontFamily: 'system-ui', whiteSpace: 'nowrap' }}>{name}</text>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginTop: '5%',
-            gap: '5px',
-          }}
-        >
-          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>
-            LOCATION:
-          </text>
+        <div style={{ display: 'flex', flexDirection: 'row', marginTop: '5%', gap: '5px' }}>
+          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>LOCATION:</text>
           <text>{location}</text>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            marginTop: '5%',
-            gap: '5px',
-          }}
-        >
-          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>
-            STATUS:
-          </text>
+        <div style={{ display: 'flex', flexDirection: 'row', marginTop: '5%', gap: '5px' }}>
+          <text style={{ fontFamily: 'system-ui', fontWeight: '700' }}>STATUS:</text>
           <text>{status}</text>
         </div>
 
-        {(status === 'Available') && <button
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-start',
-            marginTop: '7%',
-            fontFamily: 'Lora',
-            fontStyle: 'italic',
-            fontSize: '15px',
-            color: '#288BE4',
-            backgroundColor: '#ffffff',
-            border: '0',
-            marginLeft: '0',
-            paddingLeft: '0',
-            borderLeft: '0',
-            textDecoration: 'underline',
-          }}
-          onClick={openSignUp}
-        >
-          Interested in adopting →
-        </button>}
+        {status === 'Available' && (
+          <button
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              marginTop: '7%',
+              fontFamily: 'Lora',
+              fontStyle: 'italic',
+              fontSize: '15px',
+              color: '#288BE4',
+              backgroundColor: '#ffffff',
+              border: '0',
+              marginLeft: '0',
+              paddingLeft: '0',
+              borderLeft: '0',
+              textDecoration: 'underline',
+            }}
+            onClick={openSignUp}
+          >
+            Interested in adopting →
+          </button>
+        )}
       </div>
     </div>
   );
