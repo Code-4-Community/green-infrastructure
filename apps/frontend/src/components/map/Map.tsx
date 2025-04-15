@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { loader, BOSTON_BOUNDS, BOSTON_PLACE_ID } from '../../constants';
+import { loader, BOSTON_BOUNDS } from '../../constants';
 import styled from 'styled-components';
 import generateCircleSVG from '../../images/markers/circle';
 import generateSquareSVG from '../../images/markers/square';
@@ -7,6 +7,7 @@ import generateDiamondSVG from '../../images/markers/diamond';
 import generateTriangleSVG from '../../images/markers/triangle';
 import generateStarSVG from '../../images/markers/star';
 import generatePentagonSVG from '../../images/markers/pentagon';
+import generateOtherSVG from '../../images/markers/other';
 import PopupBox from '../mapIcon/PopupBox';
 import { createRoot } from 'react-dom/client';
 import { createPortal } from 'react-dom';
@@ -17,7 +18,7 @@ const MapDiv = styled.div`
 `;
 
 async function fetchAllSites() {
-  const response = await fetch('http://localhost:3000/sites'); 
+  const response = await fetch('http://localhost:3000/sites');
   if (!response.ok) {
     throw new Error('Failed to fetch site data');
   }
@@ -31,7 +32,9 @@ const iconGenerators = {
   'Porous Paving': generateDiamondSVG,
   'Tree Trench/Pit': generateStarSVG,
   'Green Roof/Planter': generatePentagonSVG,
-  'Other': generatePentagonSVG // Placeholder, will remove
+
+  'Other': generateOtherSVG // Placeholder, will remove
+
 } as const;
 
 type SymbolType = keyof typeof iconGenerators;
@@ -50,7 +53,7 @@ function filterMarkers(
   if (selectedFeatures.length === 0) {
     markers.forEach((marker: google.maps.Marker) => {
       marker.setMap(map);
-    });
+    }); 
     tempMarkers = markers;
   } else {
     markers.forEach((marker: google.maps.Marker) => marker.setMap(null));
@@ -84,14 +87,12 @@ interface MapProps {
   selectedStatuses: string[];
 }
 
-const Map: React.FC<MapProps> = ({
-  zoom,
-  selectedFeatures,
-  selectedStatuses,
-}) => {
+const Map: React.FC<MapProps> = ({ zoom, selectedFeatures, selectedStatuses }) => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const [showSignUp, setShowSignUp] = useState(false);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  // CHANGED: State to store the selected site's ID.
+  const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
 
   let map: google.maps.Map;
 
@@ -100,7 +101,7 @@ const Map: React.FC<MapProps> = ({
       loader.load().then(async () => {
         map = new google.maps.Map(mapRef.current as HTMLElement, {
           center: { lat: 42.36, lng: -71.06 },
-          zoom: 8,
+          zoom: zoom,
           mapId: '3aa9b524d13192b',
           mapTypeControl: false,
           fullscreenControl: true,
@@ -130,9 +131,17 @@ const Map: React.FC<MapProps> = ({
               console.warn(`Unknown symbol type: ${symbolType}`);
               return;
             }
+            
+            
+            let typeColor = '#58585B';    
+              if (markerInfo.siteStatus === 'Available') {
+  typeColor = '#2D6A4F'; // Green
+              } else if (markerInfo.siteStatus === 'Adopted') {
+              typeColor = '#DFC22A'; // Yellow (match legend)
+              } else if (markerInfo.siteStatus === 'Inactive') {
+  typeColor = '#58585B'; // Gray
+              }
 
-            const typeColor =
-              markerInfo.siteStatus === 'Available' ? '#2D6A4F' : '#FB4D42';
 
             const generateIcon = iconGenerators[symbolType];
             const tempIcon = generateIcon(typeColor);
@@ -169,7 +178,7 @@ const Map: React.FC<MapProps> = ({
               anchor: new google.maps.Point(10, 10),
             };
 
-            const marker: google.maps.Marker = new google.maps.Marker({
+            const marker = new google.maps.Marker({
               position: {
                 lat: Number(markerInfo.siteLatitude),
                 lng: Number(markerInfo.siteLongitude),
@@ -187,6 +196,10 @@ const Map: React.FC<MapProps> = ({
               }
               infoWindow.open(map, marker);
               currentInfoWindow = infoWindow;
+
+              // CHANGED: Store the selected site's ID in state for later use in the sign-up form.
+              setSelectedSiteId(markerInfo.siteID);
+              console.log("Selected Site ID set to:", markerInfo.siteID);
             });
 
             markersArray.push(marker);
@@ -203,12 +216,9 @@ const Map: React.FC<MapProps> = ({
 
   return (
     <div>
-      <MapDiv
-        id="map"
-        ref={mapRef}
-        style={{ width: '100%', height: '675px' }}
-      />
-      {showSignUp && <SignUpPage setShowSignUp={setShowSignUp} />}
+      <MapDiv id="map" ref={mapRef} style={{ width: '100%', height: '675px' }} />
+      {}
+      {showSignUp && <SignUpPage setShowSignUp={setShowSignUp} siteID={selectedSiteId} />}
     </div>
   );
 };

@@ -16,184 +16,99 @@ import circleSVG from '../../images/markers/circle.svg';
 import diamondSVG from '../../images/markers/diamond.svg';
 import starSVG from '../../images/markers/star.svg';
 import pentagonSVG from '../../images/markers/pentagon.svg';
+import otherSVG from '../../images/markers/other.svg';
 import { CheckboxOptionType } from 'antd/es/checkbox/Group';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+
 
 type CheckboxValueType = string | number | boolean;
 
 const Title = styled.h1`
-font-size: 15px;
-font-weight: bold; 
-font-family: Montserrat;
-margin-top: 0px
-margin-bottom: 0px;
-color: #091F2F;
-text-align: center;
-`;
-
-const Heading = styled.h2`
-  color: rgba(88, 88, 91, 1);
-  text-align: center;
-  font-family: Lora;
-  font-size: 15px;
-  margin-top: 0px;
-  font-weight: 400;
-  line-height: 19px;
-  letter-spacing: 0em;
-  text-align: center;
+  font-size: 16px; /* Title remains 14px */
+  font-weight: bold;
+  font-family: Montserrat;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: #091F2F;
+  text-align: left;
+  padding-left: 5px;
 `;
 
 const MapLegendContainer = styled.div<{ isVisible: boolean }>`
   background: rgba(255, 253, 253, 1);
-  width: 247px;
-  gap: 20px;
-  padding-right: 0px;
+  width: 280px;
   position: relative;
   transition: height 0.3s ease;
   min-height: ${(props) => (props.isVisible ? '20px' : 'auto')};
-  height: ${(props) => (props.isVisible ? '475px' : 'auto')};
-  overflow: hidden;
+  max-height: ${(props) => (props.isVisible ? '600px' : 'auto')};
+  overflow-y: auto;
+  padding-bottom: 30px;
+  padding: 25px 20px;
 `;
 
 const LegendItem = styled.div`
-  width: 100%;
   display: flex;
-  gap: 10px;
-  padding-left: 10px;
   align-items: center;
-  margin: 10px;
+  gap: 10px;
+  padding-left: 5px;
+  margin: 10px 0;
 `;
 
 const LegendImage = styled(Image)`
+  width: 21px;
   height: 20px;
-  width: 20px;
-  justify-content: center;
   display: inline-block;
 `;
 
+
 const LegendText = styled.div`
-  margin-left: 15px;
+  font-family: 'Lora', serif;
+  font-size: 16px; /* Increased text to 16px */
+  color: #000;
+  line-height: 1.3;
 `;
 
-const FeatureContainer = styled.div`
-  width: 90%;
-  height: 284px;
-  margin: 10px;
-  padding-top: 10px;
-  background: rgba(242, 242, 242, 1);
+const BoxedGroup = styled.div`
+  background-color: #F2F2F2;
+  padding: 8px;
+  margin: 10px 6px;
+  border-radius: 4px;
+  width: calc(100% - 12px);
 `;
 
 const StatusCheckbox = styled(Checkbox.Group)`
-  height: 12px;
-  width: 200px;
-  color: #fff;
-  border: line;
-  padding: 10px 20px;
-  cursor: pointer;
   display: flex;
-  .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: #e74c3c;
-    border-color: #e74c3c;
-  }
-`;
-
-const StatusContainer = styled.div`
-  width: 206px;
-  height: 79px;
-  margin: 10px;
-  background: rgba(242, 242, 242, 1);
-`;
-
-const StyledButton = styled.button<{ isSelected: boolean }>`
-  background-color: ${(props) => (props.isSelected ? '#45789C' : '#fff')};
-  height: 36px;
-  width: 187px;
-  border-style: solid;
-  border-color: black;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 14px;
-  letter-spacing: 0em;
-  text-align: left;
-  align-items: center;
-  color: ${(props) => (props.isSelected ? '#fff' : 'rgba(24, 112, 188, 1)')};
-  display: flex;
-  &:hover {
-    background-color: ${(props) => (props.isSelected ? '#45789C' : '#45789C')};
-    color: ${(props) => (props.isSelected ? '#fff' : '#fff')};
-  }
-`;
-
-const StatusButton = styled.button<{ isSelected: boolean }>`
-  // background-color: ${(props) => (props.isSelected ? '#e74c3c' : '#fff')};
-  height: 28px;
-  width: 187px;
-  // color: #fff;
-  border: none;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 16px;
-  font-family: Montserrat;
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 17px;
-  letter-spacing: 0em;
-  text-align: center;
-  align-items: center;
-  color: rgba(40, 139, 228, 1);
-  display: flex;
+  flex-direction: column;
+  padding-left: 5px;
+  gap: 5px;
 `;
 
 const ToggleContainer = styled.div<{ isVisible: boolean }>`
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   position: absolute;
-  width: 247px;
-  height: 20px;
-  z-index: 1;
+  width: 280px;
+  height: 30px;
   display: flex;
+  align-items: center;
   justify-content: center;
-  background: #091f2f;
+  background: #0072C4;
   bottom: 0px;
 `;
 
-const CaretDownStyled = styled(CaretDownOutlined)`
-  color: #ffffff;
-`;
-
-const CaretUpStyled = styled(CaretUpOutlined)`
-  color: #ffffff;
-`;
-
-const FullWidthSpace = styled(Space)`
-  width: 100%;
-`;
 const statusSpan = (statusIcon: string, labelString: string): ReactNode => {
+  let color = '#000';
+  if (labelString.toLowerCase().includes('adopted')) color = '#DFC22A';
+  if (labelString.toLowerCase().includes('available')) color = '#2D6A4F';
+  if (labelString.toLowerCase().includes('inactive')) color = '#58585B';
+
   return (
-    <FullWidthSpace direction={'horizontal'} size={'small'}>
-      <LegendImage
-        src={statusIcon}
-        alt={labelString}
-        style={{
-          width: '20px',
-          height: '20px',
-          justifyContent: 'center',
-        }}
-      />
-      <Typography.Text
-        style={{
-          fontSize: '14px',
-          fontFamily: 'Montserrat',
-          fontWeight: '600',
-          lineHeight: '17px',
-          letterSpacing: '0em',
-          textAlign: 'left',
-          alignItems: 'center',
-          color: 'rgba(24, 112, 188, 1)',
-        }}
-      >
-        {labelString.replace(' Sites', '').toUpperCase()}
+    <Space size={'small'} direction="horizontal">
+      <div style={{ width: '18px', height: '18px', backgroundColor: color }} />
+      <Typography.Text style={{ fontSize: '16px', fontFamily: 'Lora', color: '#000' }}>
+        {labelString}
       </Typography.Text>
-    </FullWidthSpace>
+    </Space>
   );
 };
 
@@ -214,234 +129,143 @@ const MapLegend: React.FC<MapLegendProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
-  const options: CheckboxOptionType[] = SITE_STATUS_ROADMAP.map((option) => {
-    return {
-      label: statusSpan(option.image, option.label),
-      value: option.value,
-    };
+  const allFeatureTypes = [
+    'Bioretention',
+    'Rain Garden',
+    'Bioswale',
+    'Porous Paving',
+    'Tree Trench/Pit',
+    'Green Roof/Planter',
+    'Other',
+  ];
+
+  useState(() => {
+    setSelectedFeatures(allFeatureTypes);
+
+    const defaultStatus = SITE_STATUS_ROADMAP.find((s) =>
+      s.label.toLowerCase().includes('available')
+    );
+    if (defaultStatus) {
+      setSelectedStatuses([defaultStatus.value]);
+    }
+
+    return;
   });
+
+  const options: CheckboxOptionType[] = SITE_STATUS_ROADMAP.map((option) => ({
+    label: statusSpan(option.image, option.label),
+    value: option.value,
+  }));
 
   const toggleShowLegend = () => {
     setIsVisible((prev) => !prev);
   };
 
-  const [availableIcon, adoptedIcon] =
-    icons ?? SITE_STATUS_ROADMAP.map((option) => option.image);
-
-  const handleFeatureClick = (icon: string) => {
-    // Check if the icon is already selected
-    const isAlreadySelected = selectedFeatures.includes(icon);
-
-    if (isAlreadySelected) {
-      // Deselect the icon
-      setSelectedFeatures((prevSelectedFeatures: string[]) =>
-        prevSelectedFeatures.filter((selected) => selected !== icon),
-      );
-    } else {
-      // Select the icon
-      setSelectedFeatures((prevSelectedFeatures: string[]) => [
-        ...prevSelectedFeatures,
-        icon,
-      ]);
-    }
+  const handleFeatureClick = (feature: string) => {
+    setSelectedFeatures((prevSelected: string[]) => {
+      if (prevSelected.includes(feature)) {
+        return prevSelected.filter((f) => f !== feature);
+      } else {
+        return [...prevSelected, feature];
+      }
+    });
   };
 
+  const CenteredIconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+`;
+
   const handleStatusClick = (values: CheckboxValueType[]) => {
-    // set selected statuses
     setSelectedStatuses(values);
   };
 
   return (
     <Collapse collapsedSize={20} in={isVisible}>
       <MapLegendContainer isVisible={isVisible}>
-        <Grid container alignItems="center" display="flex" spacing={0}>
-          <Grid
-            item
-            xs
-            style={{ display: 'flex', alignItems: 'center', flex: 1 }}
-          >
-            <hr
-              style={{
-                borderTop: '3px solid black',
-                width: '90%',
-                marginLeft: '20px',
-                marginRight: '5px',
-              }}
-            />
-          </Grid>
-          <Grid item style={{ textAlign: 'center', paddingTop: '0px' }}>
-            <Title>FEATURE TYPE</Title>
-          </Grid>
-          <Grid
-            item
-            xs
-            style={{ display: 'flex', alignItems: 'center', flex: 1 }}
-          >
-            <hr
-              style={{
-                borderTop: '3px solid black',
-                width: '90%',
-                marginLeft: '5px',
-                marginRight: '20px',
-              }}
-            />
-          </Grid>
-        </Grid>
-        <Heading>Legend and Description</Heading>
+        <Title>Feature Types</Title>
 
-        <FeatureContainer>
+        <BoxedGroup>
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Rain Garden')}
-                isSelected={selectedFeatures.includes('Rain Garden')}
-              >
-                <LegendImage
-                  src={squareSVG}
-                  alt="Square"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>RAIN GARDEN</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Bioretention')} onClick={() => handleFeatureClick('Bioretention')} />
             )}
+            <LegendImage src={circleSVG} alt="Circle" />
+            <LegendText>Bioretention</LegendText>
           </LegendItem>
 
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Bioswale')}
-                isSelected={selectedFeatures.includes('Bioswale')}
-              >
-                <LegendImage
-                  src={triangleSVG}
-                  alt="Triangle"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>BIOSWALE</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Rain Garden')} onClick={() => handleFeatureClick('Rain Garden')} />
             )}
+            <LegendImage src={squareSVG} alt="Square" />
+            <LegendText>Rain Garden</LegendText>
           </LegendItem>
 
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Bioretention')}
-                isSelected={selectedFeatures.includes('Bioretention')}
-              >
-                <LegendImage
-                  src={circleSVG}
-                  alt="Circle"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>BIORETENTION</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Bioswale')} onClick={() => handleFeatureClick('Bioswale')} />
             )}
+            <LegendImage src={triangleSVG} alt="Triangle" />
+            <LegendText>Bioswale</LegendText>
           </LegendItem>
 
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Porous Paving')}
-                isSelected={selectedFeatures.includes('Porous Paving')}
-              >
-                <LegendImage
-                  src={diamondSVG}
-                  alt="Diamond"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>POROUS PAVING</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Porous Paving')} onClick={() => handleFeatureClick('Porous Paving')} />
             )}
+            <LegendImage src={diamondSVG} alt="Diamond" />
+            <LegendText>Porous Paving</LegendText>
           </LegendItem>
 
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Tree Trench/Pit')}
-                isSelected={selectedFeatures.includes('Tree Trench/Pit')}
-              >
-                <LegendImage
-                  src={starSVG}
-                  alt="Star"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>TREE TRENCH/PIT</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Tree Trench/Pit')} onClick={() => handleFeatureClick('Tree Trench/Pit')} />
             )}
+            <LegendImage src={starSVG} alt="Star" />
+            <LegendText>Tree Trench / Planter</LegendText>
           </LegendItem>
 
           <LegendItem>
             {icons && (
-              <StyledButton
-                onClick={() => handleFeatureClick('Green Roof/Planter')}
-                isSelected={selectedFeatures.includes('Green Roof/Planter')}
-              >
-                <LegendImage
-                  src={pentagonSVG}
-                  alt="Pentagon"
-                  style={{
-                    width: '20px',
-                    height: '20px',
-                    justifyContent: 'center',
-                  }}
-                />
-                <LegendText>GREEN ROOF/PLANTER</LegendText>
-              </StyledButton>
+              <Checkbox checked={selectedFeatures.includes('Green Roof/Planter')} onClick={() => handleFeatureClick('Green Roof/Planter')} />
             )}
+            <LegendImage src={pentagonSVG} alt="Pentagon" />
+            <LegendText>Green Roof / Planter</LegendText>
           </LegendItem>
-        </FeatureContainer>
 
-        <StatusContainer>
           <LegendItem>
             {icons && (
-              <StatusCheckbox
-                onChange={(values) =>
-                  handleStatusClick(values as CheckboxValueType[])
-                }
-                value={selectedStatuses}
-                options={options}
-              />
+              <Checkbox checked={selectedFeatures.includes('Other')} onChange={() => handleFeatureClick('Other')}/>
             )}
+            <LegendImage src={otherSVG} alt="Other" />
+            <LegendText>Other</LegendText>
           </LegendItem>
-        </StatusContainer>
+
+        </BoxedGroup>
+
+        <Title>Status</Title>
+
+        <BoxedGroup>
+          <StatusCheckbox onChange={(values) => handleStatusClick(values as CheckboxValueType[])} value={selectedStatuses} options={options} />
+        </BoxedGroup>
       </MapLegendContainer>
+
       <ToggleContainer isVisible={isVisible} onClick={toggleShowLegend}>
-        {isVisible ? (
-          <ArrowBackIosIcon
-            style={{
-              transform: 'translateY(-30%) rotate(-90deg)',
-              color: 'white',
-            }}
-          />
-        ) : (
-          <ArrowBackIosIcon
-            style={{
-              transform: 'translateY(15%) rotate(90deg)',
-              color: 'white',
-            }}
-          />
-        )}
-      </ToggleContainer>
+  <KeyboardArrowDownIcon
+    style={{
+      transform: isVisible ? 'rotate(180deg)' : 'rotate(0deg)',
+      color: 'white',
+      fontSize: '24px',
+    }}
+  />
+</ToggleContainer>
+
+
+
     </Collapse>
   );
 };

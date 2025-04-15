@@ -1,9 +1,17 @@
-import { Controller, Get, Put, Post, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Put,
+  Post,
+  Body,
+  Param,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApplicationsService } from './applications.service';
 import { ApplicationsModel } from './applications.model';
 import { ApplicationStatus } from './applications.model';
 import { NewApplicationInput } from '../dtos/newApplicationsDTO';
-
 
 @Controller('applications')
 export class ApplicationsController {
@@ -29,7 +37,7 @@ export class ApplicationsController {
   @Put('editApplication/:appId')
   public async changeApplicationStatus(
     @Param('appId') appId: number,
-    @Query('applicationStatus') appStatus: ApplicationStatus
+    @Query('applicationStatus') appStatus: ApplicationStatus,
   ): Promise<ApplicationsModel> {
     // Check if the provided appStatus is a valid enum value
     if (!Object.values(ApplicationStatus).includes(appStatus)) {
@@ -39,9 +47,12 @@ export class ApplicationsController {
     return this.applicationsService.updateApplicationStatus(appId, appStatus);
   }
 
-   @Post()
+  @Post()
   public async postApplication(@Body() applicationData: NewApplicationInput) {
+    try {
       return this.applicationsService.postApplication(applicationData);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
-
 }
