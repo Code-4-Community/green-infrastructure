@@ -60,8 +60,14 @@ export class AuthService {
       Password: password,
     });
 
-    const response = await this.providerClient.send(signUpCommand);
-    return response.UserConfirmed;
+    try {
+      const response = await this.providerClient.send(signUpCommand);
+      return response.UserConfirmed;
+    } catch (e) {
+      console.log(e)
+      throw new Error(e.message);
+    }
+
   }
 
   async signin({ email, password }: SignInDto): Promise<SignInResponseDto> {
