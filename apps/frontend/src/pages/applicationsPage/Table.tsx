@@ -173,9 +173,14 @@ export default function ApplicantsTable({
   const handleApprove = async (applicantId: string) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/applications/${applicantId}`,
-        { status: ApplicationStatus.APPROVED }
+        `${import.meta.env.VITE_API_BASE_URL}/applications/editApplication/${applicantId}`,
+        null,
+        {
+          params: { applicationStatus: ApplicationStatus.APPROVED }
+        }
       );
+
+      console.log()
       
       // Update local state
       const updatedApplicants = filteredApplicants.map(app => 
@@ -194,8 +199,11 @@ export default function ApplicantsTable({
   const handleDeny = async (applicantId: string) => {
     try {
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/applications/${applicantId}`,
-        { status: ApplicationStatus.DENIED }
+        `${import.meta.env.VITE_API_BASE_URL}/applications/editApplication/${applicantId}`,
+        null,
+        {
+          params: { applicationStatus: ApplicationStatus.DENIED }
+        }
       );
       
       // Update local state
