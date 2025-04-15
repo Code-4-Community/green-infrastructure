@@ -10,8 +10,12 @@ import SearchIcon from '@mui/icons-material/Search';
 import Navbar from '../Navbar';
 import { CSSProperties, useEffect, useState } from 'react';
 import AdoptedGIBlock from './AdoptedGIBlock';
-import BioswaleImage from './BioswaleImage.png';
-import { SiteType, SITES } from '../../GIBostonSites';
+import BioswaleImage from './siteImg/BioswaleImage.png';
+import BioRetentionImage from './siteImg/bioretention.png';
+import GreenRoofImage from './siteImg/greenRoof_Planter.png';
+import RainGardenImage from './siteImg/raingarden.png';
+import TreeTrenchImage from './siteImg/tree trench_planter.png';
+import { SiteType } from '../../GIBostonSites';
 import { fetchSiteInfo, fetchUserInfo } from '../volunteerPage/VolunteerPage';
 
 const containerStyles: CSSProperties = {
@@ -123,6 +127,22 @@ function RenderFormControls({
     </div>
   );
 }
+function getFeatureImage(symbolType: string) {
+  switch (symbolType) {
+    case 'Rain Garden':
+      return RainGardenImage;
+    case 'Bioretention':
+      return BioRetentionImage;
+    case 'Green Roof/Planter':
+      return GreenRoofImage;
+    case 'Bioswale':
+      return BioswaleImage;
+    case 'Tree Trench/Pit':
+      return TreeTrenchImage;
+    default:
+      return BioswaleImage; // Default fallback image
+  }
+}
 
 export default function MyAdoptedGIPage() {
   const [sites, setSites] = useState<Array<SiteType>>([]);
@@ -131,9 +151,7 @@ export default function MyAdoptedGIPage() {
 
   useEffect(() => {
     async function fetchData() {
-      console.log('test test testDENNIS');
       const volunteerInfo = await fetchUserInfo();
-      console.log('volunteerInfo', volunteerInfo);
 
       const sitePromises = volunteerInfo.siteIds.map(async (siteId: number) => {
         const siteData = await fetchSiteInfo(siteId);
@@ -158,6 +176,7 @@ export default function MyAdoptedGIPage() {
 
       const allSites = await Promise.all(sitePromises);
       setSites(allSites);
+      console.log(allSites);
     }
     fetchData();
   }, []);
@@ -198,9 +217,9 @@ export default function MyAdoptedGIPage() {
           .map((props, index) => (
             <AdoptedGIBlock
               key={index}
-              img={BioswaleImage}
+              img={getFeatureImage(props['Symbol Type'])}
               featureName={props['Asset Name']}
-              featureType={props['Asset Type']}
+              featureType={props['Symbol Type']}
               featureAddress={props['Address']}
               lastMaintenanceDate="Last Maintenance Date"
             />

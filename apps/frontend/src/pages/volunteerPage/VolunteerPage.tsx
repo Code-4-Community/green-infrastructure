@@ -29,6 +29,35 @@ export interface UserModel {
   role: Role;
   status: UserStatus;
 }
+
+export enum SiteStatus {
+  ADOPTED = 'Adopted',
+  AVAILABLE = 'Available',
+  INACTIVE = 'Inactive',
+}
+
+export enum SymbolType {
+  RAIN_GARDEN = 'Rain Garden',
+  BIOSWALE = 'Bioswale',
+  BIORETENTION = 'Bioretention',
+  TREE_TRENCH_PIT = 'Tree Trench/Pit',
+  GREEN_ROOF_PLANTER = 'Green Roof/Planter',
+}
+
+export type SiteModel = {
+  siteID: number;
+  siteName: string;
+  siteStatus: SiteStatus;
+  assetType: string;
+  symbolType: SymbolType;
+  siteLatitude: string;
+  siteLongitude: number;
+  dateAdopted: Date;
+  maintenanceReports: number[];
+  neighborhood: string;
+  address: string;
+};
+
 export const fetchUserInfo = async () => {
   // Simulate an API call to fetch user information
   const tempUserID = '400';
@@ -37,6 +66,7 @@ export const fetchUserInfo = async () => {
     throw new Error('Failed to fetch user information');
   }
   const userData: UserModel = await response.json();
+
   return userData;
 };
 export const fetchSiteInfo = async (siteId: number) => {
@@ -45,7 +75,7 @@ export const fetchSiteInfo = async (siteId: number) => {
   if (!response.ok) {
     throw new Error('Failed to fetch site information');
   }
-  const siteData = await response.json();
+  const siteData: SiteModel = await response.json();
   return siteData;
 };
 
