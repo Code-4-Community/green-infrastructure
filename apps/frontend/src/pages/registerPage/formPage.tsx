@@ -87,16 +87,17 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
         const inputUser: SignUpDto = { email: values.email, password: values.password };
 
         await axios.post<NewUserInput>(`${import.meta.env.VITE_API_BASE_URL}/auth/signup`, inputUser);
+        setIsSubmitted(true);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const msg = error.response?.data.message || '';
           if (msg.includes("Password did not conform with policy: ")) {
             setSnackbar({ open: true, message: msg.split(': ')[1], severity: 'error' });
-          } else {
-            console.error('Unhandled Axios error:', error);
-          }
+          } else if (msg.includes("User already exists")) {
+            setSnackbar({ open: true, message: 'User already exists', severity: 'error' });
+          } 
         } else {
-          console.error('Unhandled error:', error);
+          setSnackbar({ open: true, message: 'An unexpected error occurred', severity: 'error' });
         }
       }
     },
