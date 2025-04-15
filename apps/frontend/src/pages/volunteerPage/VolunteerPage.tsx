@@ -29,25 +29,33 @@ export interface UserModel {
   role: Role;
   status: UserStatus;
 }
+export const fetchUserInfo = async () => {
+  // Simulate an API call to fetch user information
+  const tempUserID = '400';
+  const response = await fetch('http://localhost:3000/users/' + tempUserID);
+  if (!response.ok) {
+    throw new Error('Failed to fetch user information');
+  }
+  const userData: UserModel = await response.json();
+  return userData;
+};
+export const fetchSiteInfo = async (siteId: number) => {
+  // Simulate an API call to fetch site information
+  const response = await fetch('http://localhost:3000/sites/' + siteId);
+  if (!response.ok) {
+    throw new Error('Failed to fetch site information');
+  }
+  const siteData = await response.json();
+  return siteData;
+};
 
 export default function VolunteerPage() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [maintenanceChecklistOpen, setMaintenanceChecklistOpen] =
     useState(false);
-  const tempUserID = '400';
   const [volunteerInfo, setVolunteerInfo] = useState<UserModel | null>(null);
 
-  const fetchUserInfo = async () => {
-    // Simulate an API call to fetch user information
-    const response = await fetch('http://localhost:3000/users/' + tempUserID);
-    if (!response.ok) {
-      throw new Error('Failed to fetch user information');
-    }
-    const userData: UserModel = await response.json();
-    console.log(userData);
-    return userData;
-  };
   useEffect(() => {
     async function fetchData() {
       console.log('test test testDENNIS');

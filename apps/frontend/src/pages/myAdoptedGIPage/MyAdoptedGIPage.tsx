@@ -11,7 +11,8 @@ import Navbar from '../Navbar';
 import { CSSProperties, useEffect, useState } from 'react';
 import AdoptedGIBlock from './AdoptedGIBlock';
 import BioswaleImage from './BioswaleImage.png';
-import { SiteType, SITES } from '../../GIBostonSites'
+import { SiteType, SITES } from '../../GIBostonSites';
+import { fetchSiteInfo, fetchUserInfo } from '../volunteerPage/VolunteerPage';
 
 const containerStyles: CSSProperties = {
   width: '100%',
@@ -47,22 +48,31 @@ const blueLineStyle: CSSProperties = {
   marginTop: '1.5%',
 };
 
-interface Props {
-  selectedFilter: string
+interface FormControlsProps {
+  selectedFilter: string;
   setSelectedFilter: (value: string) => void;
-  selectedName: string
+  selectedName: string;
   setSelectedName: (value: string) => void;
 }
-function RenderFormControls({ selectedFilter, setSelectedFilter, selectedName, setSelectedName }: Props) {
-  const handleSiteTypeChange = (event: { target: { value: string; }; }) => {
+function RenderFormControls({
+  selectedFilter,
+  setSelectedFilter,
+  selectedName,
+  setSelectedName,
+}: FormControlsProps) {
+  const handleSiteTypeChange = (event: { target: { value: string } }) => {
     setSelectedFilter(event.target.value);
   };
-  const handleNameChange = (event: { target: { value: string; }; }) => {
+  const handleNameChange = (event: { target: { value: string } }) => {
     setSelectedName(event.target.value);
   };
   return (
     <div style={rowStyles}>
-      <FormControl variant="filled" sx={{ width: '20%', marginRight: '20px' }} size="small">
+      <FormControl
+        variant="filled"
+        sx={{ width: '20%', marginRight: '20px' }}
+        size="small"
+      >
         <InputLabel
           id="filter-one-select"
           sx={{ fontFamily: 'Montserrat, sans-serif', color: 'black' }}
@@ -77,7 +87,9 @@ function RenderFormControls({ selectedFilter, setSelectedFilter, selectedName, s
           sx={{ borderRadius: '7px' }}
           disableUnderline
         >
-          <MenuItem value="" style={{ color: 'grey' }}>Show All</MenuItem>
+          <MenuItem value="" style={{ color: 'grey' }}>
+            Show All
+          </MenuItem>
           <MenuItem value="Rain Garden">Rain Garden</MenuItem>
           <MenuItem value="Bioswale">Bioswale</MenuItem>
           <MenuItem value="Bioretention">Bioretention</MenuItem>
@@ -114,23 +126,53 @@ function RenderFormControls({ selectedFilter, setSelectedFilter, selectedName, s
 
 export default function MyAdoptedGIPage() {
   const [sites, setSites] = useState<Array<SiteType>>([]);
-  const [selectedFilter, setSelectedFilter] = useState('')
-  const [selectedName, setSelectedName] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedName, setSelectedName] = useState('');
+
   useEffect(() => {
-    const sitesCopy = [...SITES];
-    const splicedSites = sitesCopy.splice(0, 30);
-    setSites(splicedSites);
-  }, [])
+    async function fetchData() {
+      console.log('test test testDENNIS');
+      const volunteerInfo = await fetchUserInfo();
+      console.log('volunteerInfo', volunteerInfo);
+
+      const sitePromises = volunteerInfo.siteIds.map(async (siteId: number) => {
+        const siteData = await fetchSiteInfo(siteId);
+        return {
+          'Object ID?': siteData.siteID,
+          'Asset Name': siteData.siteName,
+          'Asset Type': siteData.symbolType,
+          'Symbol Type': siteData.symbolType,
+          Lat: siteData.siteLatitude,
+          Long: siteData.siteLongitude,
+          Address: siteData.address,
+          Neighborhood: siteData.neighborhood,
+          'Partner Depts.': '',
+          'Maintenance Agreement?': '',
+          'Link to Maintenance Agreement': '',
+          'Link to Maintenance Checklist': '',
+          'Link to Construction Cost + Plans': '',
+          'Link to RFQ or Bid Invitation': '',
+          'Link to Final Reports': '',
+        };
+      });
+
+      const allSites = await Promise.all(sitePromises);
+      setSites(allSites);
+    }
+    fetchData();
+  }, []);
+
   return (
     <div>
       <Navbar />
       <div style={containerStyles}>
         <div style={titleStyles}>My Adopted Green Infrastructure</div>
-        <RenderFormControls 
-        selectedFilter={selectedFilter} 
-        setSelectedFilter={setSelectedFilter}
-        selectedName={selectedName}
-        setSelectedName={setSelectedName} />
+        <RenderFormControls
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          selectedName={selectedName}
+          setSelectedName={setSelectedName}
+        />
       </div>
       <div
         style={{
@@ -143,16 +185,24 @@ export default function MyAdoptedGIPage() {
         <div style={bioswaleTitleStyles}>Features</div>
         <div className="blueLine" style={blueLineStyle} />
         {sites
-          .filter(props => props["Asset Type"].toLowerCase().includes(selectedFilter.toLowerCase()))
-          .filter(props => props["Asset Name"].toLowerCase().includes(selectedName.toLowerCase()))
+          .filter((props) =>
+            props['Asset Type']
+              .toLowerCase()
+              .includes(selectedFilter.toLowerCase()),
+          )
+          .filter((props) =>
+            props['Asset Name']
+              .toLowerCase()
+              .includes(selectedName.toLowerCase()),
+          )
           .map((props, index) => (
             <AdoptedGIBlock
               key={index}
               img={BioswaleImage}
-              featureName={props["Asset Name"]}
-              featureType={props["Asset Type"]}
-              featureAddress={props["Address"]}
-              lastMaintenanceDate='Last Maintenance Date'
+              featureName={props['Asset Name']}
+              featureType={props['Asset Type']}
+              featureAddress={props['Address']}
+              lastMaintenanceDate="Last Maintenance Date"
             />
           ))}
       </div>
