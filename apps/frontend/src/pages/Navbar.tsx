@@ -39,7 +39,7 @@ function Navbar() {
     >
       <AppBar
         position="sticky"
-        style={{ height: '109px', backgroundColor: 'rgba(255, 255, 255, 1)' }}
+        style={{ height: '80px', backgroundColor: 'rgba(255, 255, 255, 1)' }}
       >
         <Container maxWidth="xl" style={{ color: 'grey' }}>
           <Toolbar
