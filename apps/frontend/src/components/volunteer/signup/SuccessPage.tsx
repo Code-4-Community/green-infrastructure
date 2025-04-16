@@ -22,8 +22,7 @@ const SuccessPage = () => {
                 {/* Use img tag with src attribute */}
                 <p style={styles.paragraph}>Thank you!</p>
                 <p style={styles.paragraph}>
-                  Please verify your account with <br /> the link sent to your
-                  email.
+                  Thank you for submitting an application to adopt a site! We will contact you via email soon regarding the status of your site. In the meantime, please do not hesitate to reach out to the Office of Green Infrastructure if you have any questions.
                 </p>
               </div>
               <hr style={styles.line}></hr>
