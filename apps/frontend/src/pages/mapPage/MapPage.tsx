@@ -10,12 +10,10 @@ import Tiles from './Tiles';
 
 const icons: string[] = SITE_STATUS_ROADMAP.map((option) => option.image);
 
-
-
-
 export default function MapPage() {
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [query, setQuery] = useState<string>('');
 
   return (
     <div style={{ background: 'var(--Foreground, #F2F2F2)' }}>
@@ -28,6 +26,7 @@ export default function MapPage() {
           selectedFeatures={selectedFeatures}
           selectedStatuses={selectedStatuses}
           zoom={8}
+          query={query}
         />
         <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 100 }}>
           <MapLegend
@@ -49,6 +48,7 @@ export default function MapPage() {
               fontFamily: 'Open Sans',
               paddingLeft: '15px',
             }}
+            onChange={(e) => setQuery(e.target.value.toLowerCase())}
           />
         </div>
       </div>
