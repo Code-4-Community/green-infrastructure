@@ -12,6 +12,8 @@ import { ApplicationsService } from './applications.service';
 import { ApplicationsModel } from './applications.model';
 import { ApplicationStatus } from './applications.model';
 import { NewApplicationInput } from '../dtos/newApplicationsDTO';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+
 
 @Controller('applications')
 export class ApplicationsController {
@@ -35,6 +37,12 @@ export class ApplicationsController {
   }
 
   @Put('editApplication/:appId')
+  @ApiQuery({
+    name: 'applicationStatus',
+    enum: ApplicationStatus,
+    required: true,
+    description: 'The new status to set for the application',
+  })
   public async changeApplicationStatus(
     @Param('appId') appId: number,
     @Query('applicationStatus') appStatus: ApplicationStatus,
