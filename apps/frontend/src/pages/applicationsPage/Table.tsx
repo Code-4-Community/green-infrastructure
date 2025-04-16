@@ -3,6 +3,7 @@ import axios from 'axios';
 import { color, px } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import ApplicantCard from './applicantCard';
 
 export default function ApplicantsTable({
   applicants = [],
@@ -15,6 +16,9 @@ export default function ApplicantsTable({
     [],
   );
   const [filteredApplicants, setFilteredApplicants] = useState(applicants);
+  const [selectedApplicant, setSelectedApplicant] = useState<any>(null);
+  const [isCardOpen, setIsCardOpen] = useState(false);
+  const [currentApplicantIndex, setCurrentApplicantIndex] = useState(1);
 
   enum Role {
     VOLUNTEER = 'Volunteer',
@@ -207,10 +211,103 @@ export default function ApplicantsTable({
     lineHeight: 'normal',
     verticalAlign: 'middle',
     padding: '12px 12px',
+    cursor: 'pointer',
   };
 
   const margLeft = {
     marginLeft: '15px',
+  };
+
+  const handleRowClick = (applicant: any, index: number) => {
+    setSelectedApplicant(applicant);
+    setCurrentApplicantIndex(index + 1);
+    setIsCardOpen(true);
+  };
+
+  const handleCloseCard = () => {
+    setIsCardOpen(false);
+    setSelectedApplicant(null);
+  };
+
+  const handleApprove = async (applicantId: string, siteId: string) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/applications/editApplication/${applicantId}`,
+        null,
+        {
+          params: { applicationStatus: ApplicationStatus.APPROVED }
+        }
+      );
+
+      console.log(siteId)
+
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/sites/adopt/${siteId}`
+      );
+      
+      // Update local state
+      const updatedApplicants = filteredApplicants.map(app => 
+        app.appId === applicantId 
+          ? { ...app, status: ApplicationStatus.APPROVED } 
+          : app
+      );
+      
+      setFilteredApplicants(updatedApplicants);
+      navigateToNextApplicant();
+    } catch (error) {
+      console.error(`Error approving application ${applicantId}:`, error);
+    }
+  };
+
+  const handleDeny = async (applicantId: string) => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/applications/editApplication/${applicantId}`,
+        null,
+        {
+          params: { applicationStatus: ApplicationStatus.DENIED }
+        }
+      );
+      
+      // Update local state
+      const updatedApplicants = filteredApplicants.map(app => 
+        app.appId === applicantId 
+          ? { ...app, status: ApplicationStatus.DENIED } 
+          : app
+      );
+      
+      setFilteredApplicants(updatedApplicants);
+      navigateToNextApplicant();
+    } catch (error) {
+      console.error(`Error denying application ${applicantId}:`, error);
+    }
+  };
+
+  const navigateToNextApplicant = () => {
+    const currentIndex = filteredApplicants.findIndex(
+      app => app.appId === selectedApplicant.appId
+    );
+    
+    if (currentIndex < filteredApplicants.length - 1) {
+      const nextApplicant = filteredApplicants[currentIndex + 1];
+      setSelectedApplicant(nextApplicant);
+      setCurrentApplicantIndex(currentIndex + 2);
+    } else {
+      // No more applicants to review
+      handleCloseCard();
+    }
+  };
+
+  const navigateToPrevApplicant = () => {
+    const currentIndex = filteredApplicants.findIndex(
+      app => app.appId === selectedApplicant.appId
+    );
+    
+    if (currentIndex > 0) {
+      const prevApplicant = filteredApplicants[currentIndex - 1];
+      setSelectedApplicant(prevApplicant);
+      setCurrentApplicantIndex(currentIndex);
+    }
   };
 
   return (
@@ -266,12 +363,16 @@ export default function ApplicantsTable({
           </tr>
         </thead>
         <tbody>
-          {filteredApplicants.map((applicant: any) => {
+          {filteredApplicants.map((applicant: any, index: number) => {
             const user = userData[applicant.userId] || {};
             const site = siteData[applicant.siteId] || {};
 
             return (
-              <tr key={applicant.appId}>
+              <tr 
+                key={applicant.appId} 
+                onClick={() => handleRowClick(applicant, index)}
+                style={{ cursor: 'pointer' }}
+              >
                 <td style={tableData}>{user?.firstName || '-'}</td>
                 <td style={tableData}>{user?.lastName || '-'}</td>
                 <td style={tableData}>
@@ -292,6 +393,22 @@ export default function ApplicantsTable({
           })}
         </tbody>
       </table>
+
+      {selectedApplicant && (
+        <ApplicantCard
+          isOpen={isCardOpen}
+          onClose={handleCloseCard}
+          applicant={selectedApplicant}
+          user={userData[selectedApplicant.userId] || {}}
+          site={siteData[selectedApplicant.siteId] || {}}
+          onApprove={handleApprove}
+          onDeny={handleDeny}
+          onBack={navigateToPrevApplicant}
+          onSkip={navigateToNextApplicant}
+          currentIndex={currentApplicantIndex}
+          totalApplications={filteredApplicants.length}
+        />
+      )}
     </div>
   );
 }
