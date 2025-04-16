@@ -3,6 +3,7 @@ import FacebookIcon from '@material-ui/icons/Facebook';
 import YouTubeIcon from '@material-ui/icons/YouTube';
 import generateInstagramIcon from './InstagramIcon';
 import { Link } from 'react-router-dom';
+import { UserModel } from '../../pages/volunteerPage/VolunteerPage';
 
 const textStyles = {
   fontFamily: 'Montserrat, sans-serif',
@@ -20,10 +21,12 @@ const boxStyles = {
 
 interface VolunteerDashboardProps {
   setMaintenanceChecklistOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  userData: UserModel | null;
 }
 
 function VolunteerDashboard({
   setMaintenanceChecklistOpen,
+  userData,
 }: VolunteerDashboardProps) {
   return (
     <div
@@ -33,7 +36,9 @@ function VolunteerDashboard({
       <Box display="flex" flexDirection="row" justifyContent="space-between">
         <div>
           <text style={{ ...textStyles, fontWeight: '500' }}>Welcome, </text>
-          <text style={{ ...textStyles, fontWeight: '700' }}>Volunteer</text>
+          <text style={{ ...textStyles, fontWeight: '700' }}>
+            {userData ? userData.firstName : 'Volunteer'}
+          </text>
         </div>
 
         <Box display="flex" flexDirection="row" gap={3}>
@@ -91,7 +96,7 @@ function VolunteerDashboard({
               }}
             >
               <Box sx={{ ...boxStyles, height: '100%', width: '100%' }}>
-                My Adopted Green Infrastructure
+                  <p>My Adopted Green Infrastructure</p>
               </Box>
             </Link>
             <Box
