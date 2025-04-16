@@ -97,7 +97,24 @@ export class ApplicationsService {
           emailData,
         );
         console.log('Lambda result: ', lambdaResult);
-      }
+      } else if (appStatus === ApplicationStatus.DENIED) {
+        const user = await this.userService.getUser(application.userId.N);
+        const site = await this.siteService.getSite(application.siteId.N);
+        const name = user.firstName;
+        const email = user.email;
+        const siteName = site.siteName;
+
+        const emailData = {
+          firstName: name,
+          userEmail: email,
+          siteName: siteName,
+        };
+        const lambdaResult = await this.lambdaService.invokeLambda(
+          'giSendApplicationDenied',
+          emailData,
+        );
+        console.log('Lambda result: ', lambdaResult);
+      } 
       return this.mapDynamoDBItemToApplication(updatedApplication);
     } catch (e) {
       throw new Error('Unable to update application status: ' + e);
