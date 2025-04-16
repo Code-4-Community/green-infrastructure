@@ -38,6 +38,14 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showRePassword, setShowRePassword] = useState(false);
+  const [userId, setUserId] = useState('');
+  const [error, setError] = useState('');
+
+  const UserStatus = {
+    APPROVED: 'Approved',
+    PENDING: 'Pending',
+    DENIED: 'Denied',
+  };
 
   const handleTogglePassword = () => {
     setShowPassword((prev) => !prev);
@@ -47,7 +55,29 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
     setShowRePassword((prev) => !prev);
   };
 
-  // Define the validation schema using Yup
+  const handleSubmit = async () => {
+    if (!userId.trim()) {
+      setError('User ID required');
+      return;
+    }
+    //console.log('UserID: ', userId);
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/users/editUser/${userId}`,
+        { status: UserStatus.APPROVED },
+      );
+
+      setIsSubmitted(true);
+
+      //console.log('Response:', response.data);
+    } catch (e) {
+      setError('Failed to approve user. Please try again.');
+      console.error('Error: ', e);
+    }
+  };
+
+  // Validation schema using Yup
   const validationSchema = Yup.object({
     userId: Yup.string().required('User ID is required'),
     email: Yup.string()
@@ -313,6 +343,7 @@ const FormPage: React.FC<FormPageProps> = ({ setIsSubmitted }) => {
           }}
           sx={{ '& .MuiFilledInput-root': { fontFamily: 'Montserrat' } }}
         />
+        
         {formik.touched.rePassword && formik.errors.rePassword && (
           <FormHelperText
             error
