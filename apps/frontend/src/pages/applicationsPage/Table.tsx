@@ -27,6 +27,65 @@ export default function ApplicantsTable({
     DENIED = 'Denied',
   }
 
+  const getStatusStyle = (status: string | undefined): React.CSSProperties => {
+    switch (status) {
+      case 'Approved':
+        return {
+          display: 'inline-block',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          backgroundColor: '#5B9A8B',
+          color: 'white',
+          fontWeight: 'normal',
+          fontSize: '15px',
+          fontFamily: 'Montserrat, sans-serif',
+          letterSpacing: '0.5px',
+          boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
+          textAlign: 'center' as const,
+          minWidth: '100px',
+        };
+      case 'Pending':
+        return {
+          display: 'inline-block',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          backgroundColor: '#f2f2f2', 
+          color: '#666',
+          fontWeight: 'normal',
+          fontSize: '15px',
+          fontFamily: 'Montserrat, sans-serif',
+          textAlign: 'center' as const,
+          minWidth: '100px',
+        };
+      case 'Denied':
+        return {
+          display: 'inline-block',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          backgroundColor: '#D88484',
+          color: 'white',
+          fontWeight: 'normal',
+          fontSize: '15px',
+          fontFamily: 'Montserrat, sans-serif',
+          textAlign: 'center' as const,
+          minWidth: '100px',
+          boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.1)',
+        };
+      default:
+        return {
+          display: 'inline-block',
+          padding: '8px 16px',
+          borderRadius: '20px',
+          backgroundColor: '#f2f2f2',
+          color: '#666',
+          fontWeight: 'normal',
+          fontSize: '15px',
+          textAlign: 'center' as const,
+          minWidth: '100px',
+        };
+    }
+  };
+
   const toggleStatus = (status: ApplicationStatus) => {
     setSelectedStatuses((prev) =>
       prev.includes(status)
@@ -218,7 +277,11 @@ export default function ApplicantsTable({
                 <td style={tableData}>
                   {site?.siteName || '-'} {site?.assetType || '-'}
                 </td>
-                <td style={tableData}>{applicant.status || '-'}</td>
+                <td style={tableData}>
+  <div style={getStatusStyle(applicant.status)}>
+    {applicant.status || 'Pending'}
+  </div>
+</td>
                 <td style={tableData}>
                   {applicant.dateApplied
                     ? new Date(applicant.dateApplied).toLocaleDateString()
