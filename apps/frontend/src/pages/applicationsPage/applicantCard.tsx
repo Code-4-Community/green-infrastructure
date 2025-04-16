@@ -217,7 +217,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 
           <div style={sectionStyle}>
             <div style={labelStyle}>Birth Year</div>
-            <div style={valueStyle}>{user.birthYear || 'Not provided'}</div>
+            <div style={valueStyle}>{user.birthDate || 'Not provided'}</div>
           </div>
 
           <div style={sectionStyle}>
