@@ -30,6 +30,19 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 }) => {
   if (!isOpen || !applicant || !user) return null;
 
+  const isPending = applicant.status === 'Pending';
+
+
+  const handleApprove = () => {
+    onApprove(applicant.appId, applicant.siteId);
+    onClose(); // Close current card
+  };
+
+  const handleDeny = () => {
+    onDeny(applicant.appId);
+    onClose(); // Close current card
+  };
+
   const overlayStyle: React.CSSProperties = {
     position: 'fixed',
     top: 0,
@@ -47,8 +60,8 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
     backgroundColor: 'white',
     width: '100%',
     maxWidth: '450px',
-    height: '85vh',
-    margin: '7.5vh 0',
+    height: 'calc(100vh - 150px)',
+    margin: '100px 0 50px 0',
     overflowY: 'auto',
     borderTopLeftRadius: '8px',
     borderBottomLeftRadius: '8px',
@@ -85,7 +98,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
   };
 
   const sectionStyle: React.CSSProperties = {
-    marginBottom: '24px',
+    marginBottom: '15px',
   };
 
   const labelStyle: React.CSSProperties = {
@@ -102,7 +115,7 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 
   const mapContainerStyle: React.CSSProperties = {
     width: '100%',
-    height: '200px',
+    height: '180px',
     backgroundColor: '#eee',
     marginBottom: '20px',
     position: 'relative',
@@ -110,8 +123,9 @@ const ApplicantCard: React.FC<ApplicantCardProps> = ({
 
   const siteInfoStyle: React.CSSProperties = {
     position: 'absolute',
-    bottom: '0',
-    left: '0',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     backgroundColor: 'rgba(33, 84, 63, 0.9)',
     color: 'white',
     padding: '12px',
