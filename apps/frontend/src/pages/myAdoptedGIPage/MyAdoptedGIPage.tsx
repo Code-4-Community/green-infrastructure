@@ -176,7 +176,6 @@ export default function MyAdoptedGIPage() {
 
       const allSites = await Promise.all(sitePromises);
       setSites(allSites);
-      console.log(allSites);
     }
     fetchData();
   }, []);

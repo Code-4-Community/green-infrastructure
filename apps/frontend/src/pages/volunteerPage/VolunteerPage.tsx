@@ -5,6 +5,7 @@ import Map from '../../components/map/Map';
 import MapLegend from '../../components/map/MapLegend';
 import { useEffect, useState } from 'react';
 import { SITE_STATUS_ROADMAP } from '../../constants';
+import axios from 'axios';
 
 const icons: string[] = SITE_STATUS_ROADMAP.map((option) => option.image);
 export enum Role {
@@ -58,24 +59,29 @@ export type SiteModel = {
   address: string;
 };
 
-export const fetchUserInfo = async () => {
-  // Simulate an API call to fetch user information
-  const tempUserID = '400';
-  const response = await fetch('http://localhost:3000/users/' + tempUserID);
-  if (!response.ok) {
-    throw new Error('Failed to fetch user information');
-  }
-  const userData: UserModel = await response.json();
+const baseUrl = process.env.VITE_API_BASSE_URL;
 
+export const fetchUserInfo = async () => {
+  const tempUserID = '400';
+    const response = await axios.get(
+    `${baseUrl}/users/${tempUserID}`,
+  );
+  if (response.status !== 200) {
+    console.error('Failed to fetch user information');
+    console.error(response);
+  }
+  const userData: UserModel = await response.data;
   return userData;
 };
 export const fetchSiteInfo = async (siteId: number) => {
-  // Simulate an API call to fetch site information
-  const response = await fetch('http://localhost:3000/sites/' + siteId);
-  if (!response.ok) {
-    throw new Error('Failed to fetch site information');
+  const response = await axios.get(
+    `${baseUrl}/sites/${siteId}`,
+  );
+  if (response.status !== 200) {
+    console.error('Failed to fetch site information');
+    console.error(response);
   }
-  const siteData: SiteModel = await response.json();
+  const siteData: SiteModel = await response.data;
   return siteData;
 };
 
@@ -88,7 +94,6 @@ export default function VolunteerPage() {
 
   useEffect(() => {
     async function fetchData() {
-      console.log('test test testDENNIS');
       const volunteerInfo = await fetchUserInfo();
       setVolunteerInfo(volunteerInfo);
     }
