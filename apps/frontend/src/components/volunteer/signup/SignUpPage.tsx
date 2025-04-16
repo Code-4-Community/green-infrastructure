@@ -16,7 +16,7 @@ import CircleIcon from '@mui/icons-material/Circle';
 import CircleOutlinedIcon from '@mui/icons-material/CircleOutlined';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-
+import axios from 'axios';
 
 // CHANGED: Props now include the siteId.
 interface Props {
@@ -174,7 +174,7 @@ function PersonalInfo({ onSubmit, setIsFormValid }: PersonalInfoProps) {
       validationSchema={validationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      onSubmit={onSubmit}
+      onSubmit={(values) => onSubmit(values)}
     >
       {({
         values,
@@ -468,16 +468,26 @@ function TermsAndConditions({
 
 export default function SignUpPage({ setShowSignUp, siteID }: Props) {
 
+  const navigate = useNavigate();
+
   const [isChecked, setIsChecked] = useState(
     new Array(termsAndConditionsCheckboxesMap.length).fill(false),
   );
-  const [isFormValid, setIsFormValid] = useState(false); // Track form validity
-
-  const navigate = useNavigate();
+  const [isFormValid, setIsFormValid] = useState(false); // Track form validity  
+  const [formValues, setFormValues] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phone: "",
+    birthyear: "",
+    groupRepresentative: false,
+    groupMembers: "",
+  })
   const [step, setStep] = useState(1);
 
-  const handleNext = () => {
+  const handleNext = (values: any) => {
     if (step < 2) setStep(step + 1);
+    setFormValues(values);
   };
 
   const handleBack = () => {
@@ -488,10 +498,48 @@ export default function SignUpPage({ setShowSignUp, siteID }: Props) {
     setShowSignUp(false);
   };
 
-  const handleSubmit = () => {
-  if (isChecked.every(Boolean)) {
-    console.log("Submitting application for siteID:", siteID);
-    navigate('/success');
+  const handleSubmit = async () => {
+  if (isChecked.every(Boolean) && isFormValid) {
+    const userRequestBody = {
+      
+    };
+
+    try {
+      const now = new Date().toISOString();
+      const names = []
+      if (formValues["groupRepresentative"]) {
+        const groupMembers = formValues["groupMembers"].split(",")
+        names.push(...groupMembers)
+      }
+
+      const applicationRequestBody = {
+        firstName: formValues["firstname"],
+        lastName: formValues["lastname"],
+        phoneNumber: formValues["phone"],
+        email: formValues["email"],
+        zipCode: "123",
+        birthDate: formValues["birthyear"],
+        siteId: siteID,
+        names: names,
+        status: "Pending",
+        dateApplied: now,
+        isFirstApplication: true,
+      };
+
+      const applicationResponse = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/applications`,
+        applicationRequestBody,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+        }}
+      );
+      
+      navigate('/success');
+
+    } catch (error) {
+      console.error("Error:", error);
+    }
   }
 };
 

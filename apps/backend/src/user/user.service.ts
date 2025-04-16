@@ -5,6 +5,7 @@ import { UserInputModel, UserStatus, Role } from './user.model';
 import { NewUserInput } from '../dtos/newUserDTO';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 
+
 @Injectable()
 export class UserService {
   private readonly tableName = 'gibostonUsers';
