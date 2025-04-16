@@ -58,36 +58,28 @@ export default function About() {
       }}
     >
       <p ref={aboutSection} onClick={executeScrollTo} style={title}><u>ABOUT: ADOPT-A-GREEN INFRASTRUCTURE AND FEATURE VIEWER</u></p>
-      <p style={headings}>Setting the Scene and Brief History: <br />
+      <p style={headings}>About the Map: <br />
         <div style={content}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
-          exercitation ullamco laboris nisi ut aliquip ex
+        This interactive map serves to display all of the green infrastructure sites in Boston. The map legend allows users to sort sites by feature type and by the site status. A site status of 'Available' represents a site that is available, 'Adopted' represents a site that has been already adopted, and 'Inactive' represents sites that are not currently available to adopt.
         </div>
       </p>
 
       <p style={headings}>Purpose of Interactive Map: <br />
         <div style={content}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+          The purpose of this map is for users to interactively find a Green Infrastructure site that they would like to adopt and then take care of. Once the user finds a site that they would like to adopt, they can apply for the site and then wait for approval from an Admin to officially adopt the site and create a volunteer account!
         </div>
       </p>
       <p style={headings}>
         How to use Map: <br />
         <div style={content}>
           <ol type="1" style={{ margin: '0' }}>
-            <li>Lorem ipsum dolor sit amet</li>
-            <li>consectetur adipiscing elit</li>
-            <li>sed do eiusmod tempor incididunt ut labore</li>
-            <li>et dolore magna aliqua</li>
-          </ol>
-        </div>
-      </p>
+            <li>Use the interactive map to pick a site and click on the site icon to display the corresponding pop-up box</li>
+            <li>Click on 'Interested in Adopting' and complete the form to apply for the site</li>
+            <li>Submit form and wait for approval from an Admin</li>
+            <li>Once approved by Admin, an email with a unique user ID is automatically sent that allows volunteer account creation</li>
+            <li>Take care of the site and log maintenance tasks!!</li>
 
-      <p style={headings}>Importance: <br />
-        <div style={content}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-          laboris nisi ut aliquip ex
+          </ol>
         </div>
       </p>
     </div >
